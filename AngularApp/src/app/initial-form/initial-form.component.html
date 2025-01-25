@@ -1,0 +1,77 @@
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Payment Information</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="accountNumber" class="form-label">Account Number: <span class="required">*</span></label>
+            <div class="input-group">
+              <input
+              id="accountNumber"
+              formControlName="accountNumber"
+              type="text"
+              class="form-control"
+              placeholder="Enter your account number"
+              required
+              readonly
+            />
+              <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal('accountNumber')">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="paymentMethod" class="form-label">Payment Method: <span class="required">*</span></label>
+            <select
+              id="paymentMethod"
+              formControlName="paymentMethod"
+              class="form-select"
+              (change)="onPaymentMethodChange($event)"
+              required
+            >
+              <option value="" disabled selected>Select payment method</option>
+              <option *ngFor="let method of paymentMethods" [value]="method.code">
+                {{ method.name }}
+              </option>
+            </select>
+
+            <input type="hidden" name="accountName" formControlName="accountName"/>
+            <input type="hidden" name="paymentMethodDescription" formControlName="paymentMethodDescription"/>
+            <input type="hidden" name="countryCode" formControlName="countryCode"/>
+          </div>
+        </div> 
+      </div>
+      <div class="d-flex justify-content-end">
+        <button type="submit" [disabled]="!form.valid" class="btn btn-primary">Continue</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Lookup Modal -->
+<div class="modal fade" id="lookupModal" tabindex="-1" aria-labelledby="lookupModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="lookupModalLabel">{{ activeLookupField?.label }} Lookup</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th *ngFor="let header of lookupHeaders">{{ header }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="cursor: pointer;" *ngFor="let item of lookupData" (click)="selectLookupItem(item)">
+              <td *ngFor="let header of lookupHeaders">{{ item[header] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+  

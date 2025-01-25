@@ -6,7 +6,7 @@
         "fields": [
           {
             "field": "AccountNumber",
-            "label": "Debit Account",
+            "label": "Account Number",
             "type": "label",
             "required": false
           },
@@ -32,24 +32,6 @@
           {
             "field": "PaymentMethod",
             "label": "Payment Method",
-            "type": "label",
-            "required": false
-          },
-          {
-            "field": "PaymentType",
-            "label": "Payment Type",
-            "type": "label",
-            "required": false
-          },
-          {
-            "field": "BranchName",
-            "label": "Branch Name",
-            "type": "label",
-            "required": false
-          },
-          {
-            "field": "AccountBalance",
-            "label": "Debit Account Balance",
             "type": "label",
             "required": false
           }

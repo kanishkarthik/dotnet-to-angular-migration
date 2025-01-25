@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+.required{
+    color: red;
+}
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched
+{
+    border: 1px solid red;
+}

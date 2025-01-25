@@ -2,7 +2,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 declare var bootstrap: any;
 @Component({
@@ -16,7 +16,7 @@ export class DynamicFormComponent implements OnInit {
   modalOptions = {
     title: '',
     description: '',
-    ok: () => {},
+    ok: () => { },
     isCancel: false
   }
 
@@ -30,13 +30,55 @@ export class DynamicFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.metaDataKey = "in_bkt";
+    const redirectData = sessionStorage.getItem('redirectData');
+    if (!redirectData) {
+      window.location.href = '/';
+    }
+    const redirectDataObj = JSON.parse(redirectData || '');
+    this.metaDataKey = `${redirectDataObj.countryCode.toLowerCase()}_${redirectDataObj.paymentMethod.toLowerCase()}`;
+
     this.loadFormConfig(this.metaDataKey).subscribe((config) => {
+      if(config.status == '404'){
+        const modal = this.getModal('confirmationModal');
+        this.modalOptions = {
+          title: 'Error',
+          description: 'Failed to load data from configuration. Please try again later.',
+          ok: () => {
+            modal.hide();
+            window.location.href = '/';
+          },
+          isCancel: false
+        }
+        modal.show();
+        return;
+      }
       this.formConfig = config;
       this.initializeForms();
       this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
+        this.formConfig.sections.forEach((section: any) => {
+          if (section.section == 'PaymentMethod') {
+            section.fields.forEach((field: any) => {
+              if (field.field === 'PaymentMethod') {
+                field.value = redirectDataObj.paymentMethodDescription;
+              } else if (field.field === 'AccountNumber') {
+                field.value = redirectDataObj.accountNumber;
+              } else if (field.field === 'PaymentCurrency') {
+                field.value = redirectDataObj.currency;
+              } else if (field.field === 'AccountName') {
+                field.value = redirectDataObj.accountName;
+              }
+            });
+          }
+        });
+        this.forms['PaymentMethod'].get("AccountNumber")?.setValue(redirectDataObj.accountNumber);
+        this.forms['PaymentMethod'].get("AccountName")?.setValue(redirectDataObj.accountName);
+        this.forms['PaymentMethod'].get("PaymentCurrency")?.setValue(redirectDataObj.currency);
+        this.forms['PaymentMethod'].get("PaymentMethod")?.setValue(redirectDataObj.paymentMethodDescription);
+        sessionStorage.removeItem('redirectData');
         this.setFormData(data);
         this.initilizeDropdownOptions(data);
+      }, (error) => {
+        
       });
     });
   }
@@ -44,10 +86,15 @@ export class DynamicFormComponent implements OnInit {
   }
 
   loadFormConfig(key: string): Observable<any> {
-    return this.http.get(`/assets/metadata/${key}.json`);
+    return this.http.get(`/assets/metadata/${key}.json`).pipe(
+      catchError((error) => {
+        // Return a default value or an empty object
+        return of(error);
+      })
+    );
   }
 
-  loadDataFromConfig(key: string): Observable<any>{
+  loadDataFromConfig(key: string): Observable<any> {
     return this.http.get(`/assets/data/${key}.json`);
   }
 
@@ -64,16 +111,16 @@ export class DynamicFormComponent implements OnInit {
     });
   }
 
-  isFormValid() : boolean {
+  isFormValid(): boolean {
     let formValid = true;
     Object.keys(this.forms).forEach((key: string) => {
-        if (!this.forms[key].valid) {
-            formValid = false;
-        }
+      if (!this.forms[key].valid) {
+        formValid = false;
+      }
     });
     return formValid;
   }
-  
+
   onSubmit(): void {
     const modal = this.getModal('confirmationModal');
     this.modalOptions = {
@@ -102,7 +149,7 @@ export class DynamicFormComponent implements OnInit {
     modal.show();
   }
 
-  getModal(id: string) : any{
+  getModal(id: string): any {
     const modal = new bootstrap.Modal(document.getElementById(id));
     return modal;
   }
@@ -112,7 +159,7 @@ export class DynamicFormComponent implements OnInit {
     this.formConfig.sections.forEach((section: any) => {
       section.fields.forEach((field: any) => {
         if (field.type === 'dropdown') {
-          if(data[field.field] && Array.isArray(data[field.field])){
+          if (data[field.field] && Array.isArray(data[field.field])) {
             field.options = this.getDropdownValues(data[field.field], field.label);
             return;
           }
@@ -122,11 +169,11 @@ export class DynamicFormComponent implements OnInit {
     return [];
   }
 
-  getDropdownValues(data: [], label: string) { 
+  getDropdownValues(data: [], label: string) {
     const options = [];
-    options.push({label: `--Select ${label}--`, value: ''});
-    data.forEach((item: any)=>{
-      options.push({label: item.description, value: item.value});
+    options.push({ label: `--Select ${label}--`, value: '' });
+    data.forEach((item: any) => {
+      options.push({ label: item.description, value: item.value });
     });
     return options;
   }
