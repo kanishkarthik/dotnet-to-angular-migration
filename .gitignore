@@ -20,6 +20,12 @@ yarn-error.log
 .settings/
 *.sublime-workspace
 
+#Visual Studio
+.vs/*
+*/.vs/*
+*/bin/**
+*/obj/**
+
 # Visual Studio Code
 /.vscode/*
 .vscode/*
