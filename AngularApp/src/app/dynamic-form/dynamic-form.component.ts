@@ -23,7 +23,9 @@ export class DynamicFormComponent implements OnInit {
   formConfig: any;
   forms: { [key: string]: FormGroup } = {};
   metaDataKey: string = '';
-
+  activeLookupField: any;
+  lookupHeaders: string[] = [];
+  lookupData: any[] = [];
   constructor(private http: HttpClient, private fb: FormBuilder) {
   }
 
@@ -79,6 +81,7 @@ export class DynamicFormComponent implements OnInit {
       description: 'The Payment has been successfully submitted',
       ok: () => {
         modal.hide();
+        window.location.href = '/';
       },
       isCancel: false
     };
@@ -126,5 +129,28 @@ export class DynamicFormComponent implements OnInit {
       options.push({label: item.description, value: item.value});
     });
     return options;
+  }
+
+  openLookupModal(field: any, section: string) {
+    this.activeLookupField = field;
+    this.activeLookupField.section = section;
+    // Here you would typically fetch the lookup data from a service
+    this.lookupData = [
+      { id: 1, name: 'Item 1', description: 'Description 1' },
+      { id: 2, name: 'Item 2', description: 'Description 2' },
+      // ... more items
+    ];
+    this.lookupHeaders = Object.keys(this.lookupData[0]);
+
+    const modal = new bootstrap.Modal(document.getElementById('lookupModal'));
+    modal.show();
+  }
+
+  selectLookupItem(item: any) {
+    if (this.activeLookupField) {
+      this.forms[this.activeLookupField.section.section].get(this.activeLookupField.field)?.setValue(item.name);
+    }
+    const modal = bootstrap.Modal.getInstance(document.getElementById('lookupModal'));
+    modal.hide();
   }
 }
