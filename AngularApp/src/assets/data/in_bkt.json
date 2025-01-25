@@ -1,9 +1,9 @@
 {
     "DestinationBranch":  [
-        {"description" : "one", "value" : 1},
-        {"description" : "two", "value" : 2},
-        {"description" : "three", "value" : 3},
-        {"description" : "four", "value" : 4},
-        {"description" : "five", "value" : 5}
+        {"description" : "Option 1", "value" : 1},
+        {"description" : "Option 2", "value" : 2},
+        {"description" : "Option 3", "value" : 3},
+        {"description" : "Option 4", "value" : 4},
+        {"description" : "Option 5", "value" : 5}
     ]
 }

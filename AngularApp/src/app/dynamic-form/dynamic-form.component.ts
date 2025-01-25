@@ -38,7 +38,7 @@ export class DynamicFormComponent implements OnInit {
     this.metaDataKey = `${redirectDataObj.countryCode.toLowerCase()}_${redirectDataObj.paymentMethod.toLowerCase()}`;
 
     this.loadFormConfig(this.metaDataKey).subscribe((config) => {
-      if(config.status == '404'){
+      if (config.status == '404') {
         const modal = this.getModal('confirmationModal');
         this.modalOptions = {
           title: 'Error',
@@ -54,32 +54,32 @@ export class DynamicFormComponent implements OnInit {
       }
       this.formConfig = config;
       this.initializeForms();
-      this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
-        this.formConfig.sections.forEach((section: any) => {
-          if (section.section == 'PaymentMethod') {
-            section.fields.forEach((field: any) => {
-              if (field.field === 'PaymentMethod') {
-                field.value = redirectDataObj.paymentMethodDescription;
-              } else if (field.field === 'AccountNumber') {
-                field.value = redirectDataObj.accountNumber;
-              } else if (field.field === 'PaymentCurrency') {
-                field.value = redirectDataObj.currency;
-              } else if (field.field === 'AccountName') {
-                field.value = redirectDataObj.accountName;
-              }
-            });
-          }
-        });
-        this.forms['PaymentMethod'].get("AccountNumber")?.setValue(redirectDataObj.accountNumber);
-        this.forms['PaymentMethod'].get("AccountName")?.setValue(redirectDataObj.accountName);
-        this.forms['PaymentMethod'].get("PaymentCurrency")?.setValue(redirectDataObj.currency);
-        this.forms['PaymentMethod'].get("PaymentMethod")?.setValue(redirectDataObj.paymentMethodDescription);
-        sessionStorage.removeItem('redirectData');
-        this.setFormData(data);
-        this.initilizeDropdownOptions(data);
-      }, (error) => {
-        
+      //this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
+      this.formConfig.sections.forEach((section: any) => {
+        if (section.section == 'PaymentMethod') {
+          section.fields.forEach((field: any) => {
+            if (field.field === 'PaymentMethod') {
+              field.value = redirectDataObj.paymentMethodDescription;
+            } else if (field.field === 'AccountNumber') {
+              field.value = redirectDataObj.accountNumber;
+            } else if (field.field === 'PaymentCurrency') {
+              field.value = redirectDataObj.currency;
+            } else if (field.field === 'AccountName') {
+              field.value = redirectDataObj.accountName;
+            }
+          });
+        }
       });
+      this.forms['PaymentMethod'].get("AccountNumber")?.setValue(redirectDataObj.accountNumber);
+      this.forms['PaymentMethod'].get("AccountName")?.setValue(redirectDataObj.accountName);
+      this.forms['PaymentMethod'].get("PaymentCurrency")?.setValue(redirectDataObj.currency);
+      this.forms['PaymentMethod'].get("PaymentMethod")?.setValue(redirectDataObj.paymentMethodDescription);
+      sessionStorage.removeItem('redirectData');
+      this.setFormData({});
+      this.initilizeDropdownOptions({});
+      // }, (error) => {
+
+      // });
     });
   }
   setFormData(data: any) {
@@ -159,10 +159,11 @@ export class DynamicFormComponent implements OnInit {
     this.formConfig.sections.forEach((section: any) => {
       section.fields.forEach((field: any) => {
         if (field.type === 'dropdown') {
-          if (data[field.field] && Array.isArray(data[field.field])) {
-            field.options = this.getDropdownValues(data[field.field], field.label);
-            return;
-          }
+          // if (data[field.field] && Array.isArray(data[field.field])) {
+          //   field.options = this.getDropdownValues(data[field.field], field.label);
+          //   return;
+          // }
+          field.options = this.getDropdownValues([], field.label);
         }
       });
     });
@@ -172,20 +173,26 @@ export class DynamicFormComponent implements OnInit {
   getDropdownValues(data: [], label: string) {
     const options = [];
     options.push({ label: `--Select ${label}--`, value: '' });
-    data.forEach((item: any) => {
-      options.push({ label: item.description, value: item.value });
-    });
+    // data.forEach((item: any) => {
+    //   options.push({ label: item.description, value: item.value });
+    // });
+    options.push({ label: 'Option 1', value: 1 });
+    options.push({ label: 'Option 2', value: 2 });
+    options.push({ label: 'Option 3', value: 3 });
+    options.push({ label: 'Option 4', value: 4 });
+    options.push({ label: 'Option 5', value: 5 });
     return options;
   }
 
   openLookupModal(field: any, section: string) {
     this.activeLookupField = field;
     this.activeLookupField.section = section;
-    // Here you would typically fetch the lookup data from a service
     this.lookupData = [
-      { id: 1, name: 'Item 1', description: 'Description 1' },
-      { id: 2, name: 'Item 2', description: 'Description 2' },
-      // ... more items
+      { name: 'Item 1', description: 'Description 1' },
+      { name: 'Item 2', description: 'Description 2' },
+      { name: 'Item 3', description: 'Description 3' },
+      { name: 'Item 4', description: 'Description 4' },
+      { name: 'Item 5', description: 'Description 5' }
     ];
     this.lookupHeaders = Object.keys(this.lookupData[0]);
 

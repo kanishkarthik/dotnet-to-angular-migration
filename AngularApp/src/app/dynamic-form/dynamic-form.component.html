@@ -119,7 +119,7 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th *ngFor="let header of lookupHeaders">{{ header }}</th>
+              <th *ngFor="let header of lookupHeaders">{{ header.toString().charAt(0).toUpperCase() + header.toString().slice(1) }}</th>
             </tr>
           </thead>
           <tbody>
