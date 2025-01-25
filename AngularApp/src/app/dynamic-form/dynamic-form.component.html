@@ -1,0 +1,129 @@
+<div class="container mt-5">
+    <div class="card shadow">
+      <div class="card-header text-white bg-primary">
+        <h2 class="mb-0">Dynamic Payments Form</h2>
+      </div>
+      <div class="card-body">
+        <div *ngFor="let section of formConfig?.sections" class="mb-4">
+          <h3 class="text-secondary">{{ section.title }}</h3>
+          <hr class="my-3" />
+          <form [formGroup]="forms[section.section]" class="row g-3">
+            <div *ngFor="let field of section.fields" class="col-md-4">
+              <label [for]="field.field" class="form-label">{{ field.label }} <span *ngIf="field.required" class="required">*</span></label>
+
+              <!-- Textbox -->
+              <input 
+                *ngIf="field.type === 'textbox'"
+                [formControlName]="field.field"
+                [id]="field.field"
+                [required]="field.required"
+                [pattern]="field.pattern || null"
+                autocomplete="off"
+                type="text"
+                class="form-control"
+              />
+
+              <!-- Label -->
+              <label 
+              *ngIf="field.type === 'label'" 
+              class="form-label"  
+              [id]="field.field" 
+              >{{ field.value }}</label>
+              <!-- <input 
+                *ngIf="field.type === 'label'"
+                [formControlName]="field.field"
+                [id]="field.field"
+                type="lable"
+                class="form-control"
+                [disabled]="field.disabled || false"
+              /> -->
+               <!-- Textbox -->
+               <input 
+                *ngIf="field.type === 'lookup'"
+                [formControlName]="field.field"
+                [id]="field.field"
+                [required]="field.required"
+                [pattern]="field.pattern || null"
+                autocomplete="off"
+                type="text"
+                class="form-control"
+              />
+              <!-- Date -->
+              <input 
+                *ngIf="field.type === 'date'"
+                [formControlName]="field.field"
+                [id]="field.field"
+                type="date"
+                class="form-control"
+              />
+
+              <!-- Checkbox -->
+              <div class="form-check" *ngIf="field.type === 'checkbox'">
+                <input                  
+                  [formControlName]="field.field"
+                  [id]="field.field"
+                  type="checkbox"
+                  class="form-check-input"
+                />
+                <!-- <label class="form-check-label" [for]="field.field">{{ field.label }}</label> -->
+              </div>
+
+              <!-- Dropdown -->
+              <select 
+                *ngIf="field.type === 'dropdown'"
+                [formControlName]="field.field"
+                [id]="field.field"
+                class="form-select">
+                <option *ngFor="let option of field.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+
+              <!-- Textarea -->
+              <textarea 
+                *ngIf="field.type === 'textarea'"
+                [formControlName]="field.field"
+                [id]="field.field"
+                class="form-control">
+              </textarea>
+
+              <!-- Error Message -->
+              <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched" class="text-danger">
+                <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
+                  {{ field.label }} is required.
+                </small>
+                <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
+                  Invalid pattern for {{ field.label }}. {{field.pattern}}
+                </small>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-end">
+        <button class="btn btn-primary me-2" (click)="onSubmit()" [disabled]="!isFormValid()">Submit</button>
+        <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">{{modalOptions.title}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{modalOptions.description}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" *ngIf="modalOptions.isCancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="modalOptions.ok()">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>

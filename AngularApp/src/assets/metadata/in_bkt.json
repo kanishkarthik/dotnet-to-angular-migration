@@ -1,0 +1,137 @@
+{
+    "sections": [
+      {
+        "section": "PaymentMethod",
+        "title": "Payment Method",
+        "fields": [
+          {
+            "field": "AccountNumber",
+            "label": "Debit Account",
+            "type": "label",
+            "required": false
+          },
+          {
+            "field": "PaymentCurrency",
+            "label": "Payment Currency",
+            "type": "label",
+            "required": false
+          },
+          {
+            "field": "Amount",
+            "label": "Payment Amount",
+            "type": "textbox",
+            "pattern": "[0-9]*",
+            "required": true
+          },
+          {
+            "field": "AccountName",
+            "label": "Account Name",
+            "type": "label",
+            "required": false
+          },
+          {
+            "field": "PaymentMethod",
+            "label": "Payment Method",
+            "type": "label",
+            "required": false
+          },
+          {
+            "field": "PaymentType",
+            "label": "Payment Type",
+            "type": "label",
+            "required": false
+          },
+          {
+            "field": "BranchName",
+            "label": "Branch Name",
+            "type": "label",
+            "required": false
+          },
+          {
+            "field": "AccountBalance",
+            "label": "Debit Account Balance",
+            "type": "label",
+            "required": false
+          }
+        ]
+      },
+      {
+        "section": "PaymentDetails",
+        "title": "Payment Details",
+        "fields": [
+          {
+            "field": "TranRefNo",
+            "label": "Transaction Reference Number",
+            "type": "textbox",
+            "required": true
+          },
+          {
+            "field": "ValueDate",
+            "label": "Value Date",
+            "type": "date",
+            "required": true
+          },
+          {
+            "field": "isConfidential",
+            "label": "Confidential",
+            "type": "checkbox",
+            "required": false
+          },
+          {
+            "field": "EmailAddress",
+            "label": "Email Address",
+            "type": "textbox",
+            "required": false
+          },
+          {
+            "field": "TranTypeCode",
+            "label": "Transaction Type Code",
+            "type": "lookup",
+            "required": true
+          },
+          {
+            "field": "TranTypeDesc",
+            "label": "Transaction Type Description",
+            "type": "textarea",
+            "required": false
+          }
+        ]
+      },
+      {
+        "section": "BeneficiaryDetails",
+        "title": "Beneficiary Details",
+        "fields": [
+          {
+            "field": "BeneName",
+            "label": "Beneficiary Name",
+            "type": "lookup",
+            "required": true
+          },
+          {
+            "field": "BeneAcctNo",
+            "label": "Beneficiary Account Number",
+            "type": "textbox",
+            "required": true
+          },
+          {
+            "field": "DestinationBranch",
+            "label": "Destination Branch",
+            "type": "dropdown",
+            "required": true
+          },
+          {
+            "field": "AddrssLine1",
+            "label": "Beneficiary Address Line 1",
+            "type": "textbox",
+            "required": false
+          },
+          {
+            "field": "AddrssLine2",
+            "label": "Beneficiary Address Line 2",
+            "type": "textbox",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
