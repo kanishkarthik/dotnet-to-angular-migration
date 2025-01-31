@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #output {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        pre.json-output {
+            background-color: #1e1e2f;
+            color: #00ffae;
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        .copy-icon {
+            cursor: pointer;
+            color: #28a745; /* Changed to a more visible green color */
+            display: none; /* Initially hidden */
+        }
+        .copy-icon:hover {
+            color: #218838; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="fas fa-code me-2"></i>Metadata Generator</h2>
+                </div>
+                <div class="card-body">
+                    <form id="metadata-form">
+                        <div class="mb-3">
+                            <label for="country_code" class="form-label"><i class="fas fa-globe me-2"></i>Country Code</label>
+                            <select class="form-control" id="country_code" name="country_code" required>
+                                <option value="" selected disabled>Select a country</option>
+                                <option value="IN">India</option>
+                                <option value="AU">Australia</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="GB">United Kingdom</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label"><i class="fas fa-credit-card me-2"></i>Payment Method</label>
+                            <select class="form-control" id="payment_method" name="payment_method" required>
+                                <option value="" selected disabled>Select a payment method</option>
+                                <option value="BKT">Book Transfer</option>
+                                <option value="CBFT">Cross Border Fund Transfer</option>
+                                <option value="DFT">Domestic Fund Transfer</option>
+                                <option value="RCH">Cheque</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-cogs me-2"></i>Generate Metadata</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-file-code me-2"></i>Metadata Output</h4>
+                    <i class="fas fa-copy copy-icon" id="copyBtn" title="Copy to Clipboard"></i>
+                </div>
+                <div class="card-body">
+                    <pre id="output" class="mb-0"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("metadata-form").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const countryCode = document.getElementById("country_code").value;
+        const paymentMethod = document.getElementById("payment_method").value;
+        const output = document.getElementById("output");
+        const copyBtn = document.getElementById("copyBtn");
+        
+        output.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        copyBtn.style.display = 'none'; // Hide the copy icon initially
+
+        try {
+            const response = await fetch("/generate-metadata", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `country_code=${encodeURIComponent(countryCode)}&payment_method=${encodeURIComponent(paymentMethod)}`
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const formattedJson = JSON.stringify(JSON.parse(data.metadata, null, 2), null, 2);
+                output.innerHTML = `<pre class="json-output"><code>${formattedJson}</code></pre>`;
+                copyBtn.style.display = 'inline'; // Show the copy icon if response is successful
+
+                copyBtn.addEventListener("click", function() {
+                    navigator.clipboard.writeText(formattedJson).then(() => {
+                        this.classList.remove('fa-copy');
+                        this.classList.add('fa-check');
+                        setTimeout(() => {
+                            this.classList.remove('fa-check');
+                            this.classList.add('fa-copy');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                });
+            } else {
+                const error = await response.json();
+                output.innerHTML = `<div class="alert alert-danger" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Error: ${error.error}</div>`;
+            }
+        } catch (error) {
+            output.innerHTML = `<div class="alert alert-danger" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Network Error: ${error.message}</div>`;
+        }
+    });
+</script>
+</body>
+</html>

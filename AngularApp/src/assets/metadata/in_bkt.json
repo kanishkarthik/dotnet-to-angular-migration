@@ -1,35 +1,35 @@
 {
   "sections": [
     {
-      "section": "PaymentMethod",
-      "title": "Payment Method",
+      "section": "Payment Method",
+      "title": "Payment Method Details",
       "fields": [
         {
-          "field": "AccountNumber",
+          "field": "PaymentMethod.AccountNumber",
           "label": "Account Number",
           "type": "label",
           "required": false
         },
         {
-          "field": "PaymentCurrency",
+          "field": "PaymentMethod.PaymentCurrency",
           "label": "Payment Currency",
           "type": "label",
           "required": false
         },
         {
-          "field": "Amount",
+          "field": "PaymentMethod.Amount",
           "label": "Payment Amount",
           "type": "textbox",
           "required": true
         },
         {
-          "field": "AccountName",
+          "field": "PaymentMethod.AccountName",
           "label": "Account Name",
           "type": "label",
           "required": false
         },
         {
-          "field": "PaymentMethod",
+          "field": "PaymentMethod.PaymentMethod",
           "label": "Payment Method",
           "type": "label",
           "required": false
@@ -37,42 +37,42 @@
       ]
     },
     {
-      "section": "PaymentDetails",
+      "section": "Payment Details",
       "title": "Payment Details",
       "fields": [
         {
-          "field": "TranRefNo",
+          "field": "PaymentDetails.TranRefNo",
           "label": "Transaction Reference Number",
           "type": "textbox",
           "required": true,
           "pattern": "[a-zA-Z0-9]+"
         },
         {
-          "field": "ValueDate",
+          "field": "PaymentDetails.ValueDate",
           "label": "Value Date",
           "type": "date",
           "required": true
         },
         {
-          "field": "isConfidential",
+          "field": "PaymentDetails.isConfidential",
           "label": "Confidential",
           "type": "checkbox",
           "required": false
         },
         {
-          "field": "EmailAddress",
+          "field": "PaymentDetails.EmailAddress",
           "label": "Email Address",
           "type": "textbox",
           "required": false
         },
         {
-          "field": "TranTypeCode",
+          "field": "PaymentDetails.TranTypeCode",
           "label": "Transaction Type Code",
           "type": "lookup",
           "required": true
         },
         {
-          "field": "TranTypeDesc",
+          "field": "PaymentDetails.TranTypeDesc",
           "label": "Transaction Type Description",
           "type": "textarea",
           "required": false
@@ -80,35 +80,35 @@
       ]
     },
     {
-      "section": "BeneficiaryDetails",
+      "section": "Beneficiary Details",
       "title": "Beneficiary Details",
       "fields": [
         {
-          "field": "BeneName",
+          "field": "BeneficiaryDetails.BeneName",
           "label": "Beneficiary Name",
           "type": "lookup",
           "required": true
         },
         {
-          "field": "BeneAcctNo",
+          "field": "BeneficiaryDetails.BeneAcctNo",
           "label": "Beneficiary Account Number",
           "type": "textbox",
           "required": true
         },
         {
-          "field": "DestinationBranch",
+          "field": "BeneficiaryDetails.DestinationBranch",
           "label": "Destination Branch",
           "type": "dropdown",
           "required": true
         },
         {
-          "field": "AddrssLine1",
+          "field": "BeneficiaryDetails.AddrssLine1",
           "label": "Beneficiary Address Line 1",
           "type": "textbox",
           "required": false
         },
         {
-          "field": "AddrssLine2",
+          "field": "BeneficiaryDetails.AddrssLine2",
           "label": "Beneficiary Address Line 2",
           "type": "textbox",
           "required": false

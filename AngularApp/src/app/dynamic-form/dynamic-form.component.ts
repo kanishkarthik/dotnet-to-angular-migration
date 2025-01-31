@@ -56,7 +56,7 @@ export class DynamicFormComponent implements OnInit {
       this.initializeForms();
       //this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
       this.formConfig.sections.forEach((section: any) => {
-        if (section.section == 'PaymentMethod') {
+        if (section.section.toLowerCase() == 'PaymentMethod'.toLowerCase()) {
           section.fields.forEach((field: any) => {
             if (field.field === 'PaymentMethod') {
               field.value = redirectDataObj.paymentMethodDescription;

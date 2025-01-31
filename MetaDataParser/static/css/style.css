@@ -1,0 +1,34 @@
+body {
+    background-color: #f8f9fa;
+}
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+#output {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    max-height: 700px;
+    overflow-y: auto;
+}
+pre.json-output {
+    background-color: #1e1e2f;
+    color: #00ffae;
+    padding: 15px;
+    border-radius: 8px;
+    overflow: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+.preview-icon, .copy-icon {
+    cursor: pointer;
+    color: #ffffff;
+    margin-left: 10px;
+    display: none; /* Initially hidden */
+}
+.preview-icon:hover, .copy-icon:hover {
+    color: #dddddd;
+}
