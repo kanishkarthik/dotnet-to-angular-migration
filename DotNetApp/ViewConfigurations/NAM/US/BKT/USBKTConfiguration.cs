@@ -1,11 +1,12 @@
-﻿using Application.ViewModels.ASIA.BKT;
+﻿using Application.ViewModels.NAM.US.BKT;
 using DotNetApp.Core.Configuration;
+using System;
 
-namespace DotNetApp.ViewConfigurations.ASIA.India
+namespace DotNetApp.ViewConfigurations.NAM.US.BKT
 {
-    public class IndiaBKTConfiguration : PropertyConfiguration<IndiaBKTModel>
+    public class USBKTConfiguration : PropertyConfiguration<USBKTModel>
     {
-        public IndiaBKTConfiguration(IndiaBKTModel model) : base(model)
+        public USBKTConfiguration(USBKTModel model) : base(model)
         {
         }
 
@@ -14,8 +15,10 @@ namespace DotNetApp.ViewConfigurations.ASIA.India
             ConfigurePaymentMethod();
             ConfigurePaymentDetails();
             ConfigureBeneficiaryDetails();
+            ConfigureOrderingPartyDetails();
         }
 
+        
         public void ConfigurePaymentMethod()
         {
             ConfigureModel(model => model.PaymentMethod.AccountNumber)
@@ -56,19 +59,6 @@ namespace DotNetApp.ViewConfigurations.ASIA.India
             ConfigureModel(model => model.PaymentDetails.isConfidential)
                 .Name("Confidential")
                 .Type("checkbox");
-
-            ConfigureModel(model => model.PaymentDetails.EmailAddress)
-               .Name("Email Address")
-               .Type("textbox");
-
-            ConfigureModel(model => model.PaymentDetails.TranTypeCode)
-                .Name("Transaction Type Code")
-                .Type("lookup")
-                .Required(true);
-
-            ConfigureModel(model => model.PaymentDetails.TranTypeDesc)
-                .Name("Transaction Type Description")
-                .Type("textarea");
         }
 
         public void ConfigureBeneficiaryDetails()
@@ -83,11 +73,6 @@ namespace DotNetApp.ViewConfigurations.ASIA.India
                 .Type("textbox")
                 .Required(true);
 
-            ConfigureModel(model => model.BeneficiaryDetails.DestinationBranch)
-                .Name("Destination Branch")
-                .Type("dropdown")
-                .Required(true);
-
             ConfigureModel(model => model.BeneficiaryDetails.AddrssLine1)
                 .Name("Beneficiary Address Line 1")
                 .Type("textbox");
@@ -95,6 +80,14 @@ namespace DotNetApp.ViewConfigurations.ASIA.India
             ConfigureModel(model => model.BeneficiaryDetails.AddrssLine2)
                 .Name("Beneficiary Address Line 2")
                 .Type("textbox");      
+        }
+
+        private void ConfigureOrderingPartyDetails()
+        {
+            ConfigureModel(model => model.OrderingPartyDetails.Name)
+              .Name("Ordering Party Name")
+              .Type("textbox")
+              .Pattern("[a-zA-Z0-9]+");
         }
     }
 }

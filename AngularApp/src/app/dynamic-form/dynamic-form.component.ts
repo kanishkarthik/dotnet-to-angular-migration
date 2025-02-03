@@ -101,11 +101,12 @@ export class DynamicFormComponent implements OnInit {
   initializeForms(): void {
     this.formConfig.sections.forEach((section: any) => {
       const group: any = {};
+      
       section.fields.forEach((field: any) => {
         const validators = [];
-        if (field.required) validators.push(Validators.required);
+        if (field.required == "true") validators.push(Validators.required);
         if (field.pattern) validators.push(Validators.pattern(`^${field.pattern}$`));
-        group[field.field] = new FormControl({ value: '', disabled: field.disabled || false }, validators);
+        group[field.field] = new FormControl({ value: '', disabled: field.disabled == "true" || false }, validators);
       });
       this.forms[section.section] = this.fb.group(group);
     });

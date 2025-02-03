@@ -1,7 +1,7 @@
 ﻿using Application.Controllers.Base;
-using Application.ViewModels.ASIA.BKT;
+using Application.ViewModels.ASIA.India.BKT;
 
-namespace Application.Controllers.ASIA.India
+namespace Application.Controllers.ASIA.India.BKT
 {
     public class IndiaBKTController : BaseController<IndiaBKTModel>
     {

@@ -20,6 +20,7 @@ const paymentHeaderDetails = {
             optionsName: ['number', 'name', 'currency', 'countryCode'],
             optionsValue: [
                 { number: '14447026', name: 'Account 1', currency: 'INR', countryCode: 'IN' },
+                { number: '20123456', name: 'Account 2', currency: 'US', countryCode: 'US' },
             ]
         }
     ],
@@ -126,7 +127,8 @@ initializePaymentMethods(paymentMethods);
 
 window.onload = function () {
     const routes = {
-        'in_bkt': 'indiabkt'
+        'in_bkt': 'indiabkt',
+        'us_bkt': 'usbkt'
     }
     document.getElementById('continue').addEventListener('click', function () {
         const paymentMethod = document.getElementById('PaymentMethod').value;

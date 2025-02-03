@@ -1,9 +1,9 @@
-﻿using DotNetApp.ViewConfigurations.ASIA.India;
-using Application.ViewModels.ASIA.BKT;
+﻿using Application.ViewModels.ASIA.India.BKT;
 using DotNetApp.Core.Configuration;
 using DotNetApp.Core.ViewConfiguration;
+using DotNetApp.ViewConfigurations.ASIA.India.BKT;
 
-namespace Application.Views.ASIA.IndiaBKT
+namespace Application.Views.ASIA.India.BKT
 {
     public class IndiaBKTView : BaseView<IndiaBKTModel>
     {

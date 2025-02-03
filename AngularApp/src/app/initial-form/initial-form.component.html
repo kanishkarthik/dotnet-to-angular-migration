@@ -1,67 +1,77 @@
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Payment Information</h2>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="accountNumber" class="form-label">Account Number: <span class="required">*</span></label>
-            <div class="input-group">
-              <input
-              id="accountNumber"
-              formControlName="accountNumber"
-              type="text"
-              class="form-control"
-              placeholder="Enter your account number"
-              required
-              readonly
-            />
-              <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal('accountNumber')">
-                <i class="bi bi-search"></i>
-              </button>
-            </div>
-          </div>
+  <h2 class="mb-4 text-center fw-bold text-primary">Payment Details</h2>
+  
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="row mb-4">
+      <!-- Account Number Field -->
+      <div class="col-md-6">
+        <div class="form-floating">
+          <input 
+            id="accountNumber"
+            formControlName="accountNumber"
+            type="text"
+            class="form-control"
+            placeholder="Enter your account number"
+            required
+            readonly
+          />
+          <label for="accountNumber">Your Account Number <span class="text-danger">*</span></label>
+          <button class="btn btn-outline-secondary position-absolute end-0 top-50 translate-middle-y me-2" 
+            type="button" 
+            (click)="openLookupModal('accountNumber')">
+            🔍
+          </button>
         </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="paymentMethod" class="form-label">Payment Method: <span class="required">*</span></label>
-            <select
-              id="paymentMethod"
-              formControlName="paymentMethod"
-              class="form-select"
-              (change)="onPaymentMethodChange($event)"
-              required
-            >
-              <option value="" disabled selected>Select payment method</option>
-              <option *ngFor="let method of paymentMethods" [value]="method.code">
-                {{ method.name }}
-              </option>
-            </select>
-
-            <input type="hidden" name="accountName" formControlName="accountName"/>
-            <input type="hidden" name="paymentMethodDescription" formControlName="paymentMethodDescription"/>
-            <input type="hidden" name="countryCode" formControlName="countryCode"/>
-          </div>
-        </div> 
       </div>
-      <div class="d-flex justify-content-end">
-        <button type="submit" [disabled]="!form.valid" class="btn btn-primary">Continue</button>
-      </div>
-    </form>
-  </div>
 
-  <!-- Lookup Modal -->
+      <!-- Payment Method Dropdown -->
+      <div class="col-md-6">
+        <div class="form-floating">
+          <select
+            id="paymentMethod"
+            formControlName="paymentMethod"
+            class="form-select"
+            (change)="onPaymentMethodChange($event)"
+            required
+          >
+            <option *ngFor="let method of paymentMethods" [value]="method.code">
+              {{ method.name }}
+            </option>
+          </select>
+          <label for="paymentMethod">Select a Payment Option <span class="text-danger">*</span></label>
+        </div>
+      </div> 
+    </div>
+
+    <!-- Hidden Inputs -->
+    <input type="hidden" name="accountName" formControlName="accountName"/>
+    <input type="hidden" name="paymentMethodDescription" formControlName="paymentMethodDescription"/>
+    <input type="hidden" name="countryCode" formControlName="countryCode"/>
+
+    <!-- Submit Button -->
+    <div class="d-flex justify-content-end mt-3">
+      <button type="submit" [disabled]="!form.valid" class="btn btn-success btn-lg shadow-sm px-4">
+        Continue ➜
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Lookup Modal -->
 <div class="modal fade" id="lookupModal" tabindex="-1" aria-labelledby="lookupModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="lookupModalLabel">Account NUmber Lookup</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title mx-auto fw-bold" id="lookupModalLabel">Search Your Account</h5>
+        <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover table-striped">
+          <thead class="table-dark">
             <tr>
-              <th *ngFor="let header of lookupHeaders">{{ header.toString().charAt(0).toUpperCase() + header.toString().slice(1) }}</th>
+              <th *ngFor="let header of lookupHeaders">
+                {{ header.toString().charAt(0).toUpperCase() + header.toString().slice(1) }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -74,4 +84,3 @@
     </div>
   </div>
 </div>
-  

@@ -1,7 +1,8 @@
 import json
 import re
 from groq import Groq
-from config.constants import GROQ_API_KEY
+
+from config.constants import GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL, SAMPLE_METADATA_PATH
 
 # Initialize Groq client
 client = Groq(api_key=GROQ_API_KEY)
@@ -9,19 +10,32 @@ client = Groq(api_key=GROQ_API_KEY)
 def analyze_with_groq(file_content):
     """Send the .cs file content to Groq API and get the JSON metadata."""
     try:
+        metadata_structure = ''
+        # read json as string config/metadata_sample.json
+        with open(SAMPLE_METADATA_PATH, 'r') as file:
+            # read json as string config/metadata_sample
+            metadata_structure = file.read()
+        # Define metadata structure explanation
+        prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
+        that can be used to dynamically render fields in an Angular UI. 
+
+        The metadata format should match this structure, and you may need to consider additional UI parameters 
+        that are not explicitly mentioned and provide attributes only when it is necessary:
+        """
+        asp_net_mvc_config = """
+        Asp.NET MVC configuration(class based view engine):
+        {}    
+        """.format(file_content)
+        # prompt + metadata_structure + asp_net_mvc_config
+
         chat_completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "user",
-                    "content": (
-                        "Analyze the given ASP.NET MVC configuration file and generate JSON metadata "
-                        "that can be used to dynamically render fields in an Angular UI. The metadata format should match this structure and you may need to consider other UI params which not mentioned: "
-                        '{"sections": [{"section": "sectionName", "title": "Section Title", "fields": [{"field": "fieldName", "label": "Field Label", "type": "FieldType", "required": true|false}]}]}.\n\nFile content:\n\n'
-                        + file_content
-                    ),
+                    "content": prompt + metadata_structure + asp_net_mvc_config,
                 }
             ],
-            model="llama-3.3-70b-versatile",
+            model=GROQ_LARGE_LANGUAGE_MODEL,
         )
         json_part = re.search(r'```json\n(.*?)```', chat_completion.choices[0].message.content, re.DOTALL)
         if json_part:

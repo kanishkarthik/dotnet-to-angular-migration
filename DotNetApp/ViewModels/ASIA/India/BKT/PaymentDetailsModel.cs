@@ -1,4 +1,4 @@
-﻿namespace Application.ViewModels.ASIA.BKT
+﻿namespace Application.ViewModels.ASIA.India.BKT
 {
     public class PaymentDetailsModel
     {

@@ -1,5 +1,8 @@
 {
   "in_bkt": {
-    "config_path": "ASIA\\India\\IndiaBKTConfiguration.cs"
+    "config_path": "ASIA\\India\\BKT\\IndiaBKTConfiguration.cs"
   },
+  "us_bkt": {
+    "config_path": "NAM\\US\\BKT\\USBKTConfiguration.cs"
+  }
 }

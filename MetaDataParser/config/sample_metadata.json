@@ -1,0 +1,19 @@
+{
+    "sections": [
+      {
+        "section": "sectionName",
+        "title": "Section Title",
+        "fields": [
+          {
+            "field": "fieldName",
+            "label": "Field Label",
+            "type": "FieldType",
+            "required": "true",
+            "disabled": "true",
+            "pattern": "[a-z]"
+          }
+        ]
+      }
+    ]
+  }
+  
