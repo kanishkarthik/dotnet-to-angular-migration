@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, jsonify
 from config.constants import ANGULAR_APP_METADATA_PATH, ASPNETMVC_APP_PATH
+from services.gemini_service import analyze_with_gemini
 from services.groq_service import analyze_with_groq
 from services.config_loader import load_configurations
 
@@ -20,6 +21,7 @@ def generate_metadata():
     """Generate JSON metadata based on user input."""
     country_code = request.form.get("country_code")
     payment_method = request.form.get("payment_method")
+    ai_model = request.form.get("ai_model")
 
     if not country_code or not payment_method:
         return jsonify({"error": "Country code and payment method are required!"}), 400
@@ -35,9 +37,16 @@ def generate_metadata():
     try:
         # Read .cs file content
         file_content = read_cs_file(config_path)
-        # Analyze content using Groq
-        metadata = analyze_with_groq(file_content)
-        
+        metadata = ''
+        print(ai_model)
+        if ai_model == 'groq':
+            # Analyze content using Groq
+            metadata = analyze_with_groq(file_content)
+        elif ai_model == 'gemini':
+            # Analyze content using Gemini AI
+            metadata = analyze_with_gemini(file_content)
+        print(metadata, "metadata")
+            
         # Write metadata to the Angular App directory
         with open(os.path.join(ANGULAR_APP_METADATA_PATH, f"{key}.json"), "w") as f:
             f.write(metadata)

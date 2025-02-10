@@ -6,6 +6,12 @@ GROQ_API_KEY = "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"
 # Groq (LLM)
 GROQ_LARGE_LANGUAGE_MODEL = "llama-3.3-70b-versatile"
 
+# Gemini API Key
+GEMINI_API_KEY = "AIzaSyANB3nTAyUGRfMmpYQp73hI-3ZUyAp5Q-k"
+
+# Gemini Model
+GEMINI_MODEL = "gemini-1.5-pro-latest"
+
 # App Root Path
 ROOT_PATH = os.path.dirname(__file__).replace('\MetaDataParser\config', '')
 

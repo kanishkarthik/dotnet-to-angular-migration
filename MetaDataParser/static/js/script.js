@@ -2,6 +2,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     e.preventDefault();
     const countryCode = document.getElementById("country_code").value;
     const paymentMethod = document.getElementById("payment_method").value;
+    const ai_model = document.getElementById("ai_model").value;
     const output = document.getElementById("output");
     const previewBtn = document.getElementById("previewBtn");
     const copyBtn = document.getElementById("copyBtn");
@@ -14,7 +15,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
         const response = await fetch("/generate-metadata", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `country_code=${encodeURIComponent(countryCode)}&payment_method=${encodeURIComponent(paymentMethod)}`
+            body: `country_code=${encodeURIComponent(countryCode)}&payment_method=${encodeURIComponent(paymentMethod)}&ai_model=${encodeURIComponent(ai_model)}`
         });
 
         if (response.ok) {

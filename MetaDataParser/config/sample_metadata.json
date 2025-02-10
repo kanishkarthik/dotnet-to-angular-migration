@@ -5,7 +5,7 @@
         "title": "Section Title",
         "fields": [
           {
-            "field": "fieldName",
+            "field": "sectionName.fieldName",
             "label": "Field Label",
             "type": "FieldType",
             "required": "true",
