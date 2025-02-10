@@ -5,37 +5,33 @@
       "title": "Payment Method",
       "fields": [
         {
-          "field": "PaymentMethod.AccountNumber",
+          "field": "PaymentMethod_AccountNumber",
           "label": "Account Number",
           "type": "label",
-          "required": "false",
           "disabled": "true"
         },
         {
-          "field": "PaymentMethod.PaymentCurrency",
+          "field": "PaymentMethod_PaymentCurrency",
           "label": "Payment Currency",
           "type": "label",
-          "required": "false",
           "disabled": "true"
         },
         {
-          "field": "PaymentMethod.Amount",
+          "field": "PaymentMethod_Amount",
           "label": "Payment Amount",
           "type": "textbox",
           "required": "true"
         },
         {
-          "field": "PaymentMethod.AccountName",
+          "field": "PaymentMethod_AccountName",
           "label": "Account Name",
           "type": "label",
-          "required": "false",
           "disabled": "true"
         },
         {
-          "field": "PaymentMethod.PaymentMethod",
+          "field": "PaymentMethod_PaymentMethod",
           "label": "Payment Method",
           "type": "label",
-          "required": "false",
           "disabled": "true"
         }
       ]
@@ -45,41 +41,38 @@
       "title": "Payment Details",
       "fields": [
         {
-          "field": "PaymentDetails.TranRefNo",
+          "field": "PaymentDetails_TranRefNo",
           "label": "Transaction Reference Number",
           "type": "textbox",
           "required": "true",
           "pattern": "[a-zA-Z0-9]+"
         },
         {
-          "field": "PaymentDetails.ValueDate",
+          "field": "PaymentDetails_ValueDate",
           "label": "Value Date",
           "type": "date",
           "required": "true"
         },
         {
-          "field": "PaymentDetails.isConfidential",
+          "field": "PaymentDetails_isConfidential",
           "label": "Confidential",
-          "type": "checkbox",
-          "required": "false"
+          "type": "checkbox"
         },
         {
-          "field": "PaymentDetails.EmailAddress",
+          "field": "PaymentDetails_EmailAddress",
           "label": "Email Address",
-          "type": "textbox",
-          "required": "false"
+          "type": "textbox"
         },
         {
-          "field": "PaymentDetails.TranTypeCode",
+          "field": "PaymentDetails_TranTypeCode",
           "label": "Transaction Type Code",
           "type": "lookup",
           "required": "true"
         },
         {
-          "field": "PaymentDetails.TranTypeDesc",
+          "field": "PaymentDetails_TranTypeDesc",
           "label": "Transaction Type Description",
-          "type": "textarea",
-          "required": "false"
+          "type": "textarea"
         }
       ]
     },
@@ -88,34 +81,32 @@
       "title": "Beneficiary Details",
       "fields": [
         {
-          "field": "BeneficiaryDetails.BeneName",
+          "field": "BeneficiaryDetails_BeneName",
           "label": "Beneficiary Name",
           "type": "lookup",
           "required": "true"
         },
         {
-          "field": "BeneficiaryDetails.BeneAcctNo",
+          "field": "BeneficiaryDetails_BeneAcctNo",
           "label": "Beneficiary Account Number",
           "type": "textbox",
           "required": "true"
         },
         {
-          "field": "BeneficiaryDetails.DestinationBranch",
+          "field": "BeneficiaryDetails_DestinationBranch",
           "label": "Destination Branch",
           "type": "dropdown",
           "required": "true"
         },
         {
-          "field": "BeneficiaryDetails.AddrssLine1",
+          "field": "BeneficiaryDetails_AddrssLine1",
           "label": "Beneficiary Address Line 1",
-          "type": "textbox",
-          "required": "false"
+          "type": "textbox"
         },
         {
-          "field": "BeneficiaryDetails.AddrssLine2",
+          "field": "BeneficiaryDetails_AddrssLine2",
           "label": "Beneficiary Address Line 2",
-          "type": "textbox",
-          "required": "false"
+          "type": "textbox"
         }
       ]
     }
