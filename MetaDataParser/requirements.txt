@@ -4,3 +4,7 @@ ollama
 chromadb
 sentence-transformers
 flask
+llama_index
+llama-index-llms-groq
+llama-index-embeddings-huggingface
+dotenv

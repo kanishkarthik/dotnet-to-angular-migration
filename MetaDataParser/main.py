@@ -1,6 +1,8 @@
 import os
 from flask import Flask, render_template, request, jsonify
-from config.constants import ANGULAR_APP_METADATA_PATH, ASPNETMVC_APP_PATH
+from groq import Groq
+from services.groq_ingest_service import groq_ingest_load
+from config.constants import ANGULAR_APP_METADATA_PATH, ASPNETMVC_APP_PATH, GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL
 from services.gemini_service import analyze_with_gemini
 from services.groq_service import analyze_with_groq
 from services.config_loader import load_configurations
@@ -16,13 +18,14 @@ def index():
     """Render the input form for country code and payment method."""
     return render_template("main.html")
 
+
+
 @app.route("/generate-metadata", methods=["POST"])
-def generate_metadata():
+def generate_metadata():    
     """Generate JSON metadata based on user input."""
     country_code = request.form.get("country_code")
     payment_method = request.form.get("payment_method")
     ai_model = request.form.get("ai_model")
-
     if not country_code or not payment_method:
         return jsonify({"error": "Country code and payment method are required!"}), 400
 
@@ -42,6 +45,9 @@ def generate_metadata():
         if ai_model == 'groq':
             # Analyze content using Groq
             metadata = analyze_with_groq(file_content)
+        elif ai_model == 'groq_ingest':
+            # Analyze content using Groq with large language model
+            metadata = groq_ingest_load(country_code, payment_method)
         elif ai_model == 'gemini':
             # Analyze content using Gemini AI
             metadata = analyze_with_gemini(file_content)
