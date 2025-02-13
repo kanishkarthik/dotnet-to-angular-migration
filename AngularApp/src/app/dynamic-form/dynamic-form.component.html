@@ -1,8 +1,8 @@
-<div class="container-fluid py-5">
+<div class="container-fluid py-5 bg-light">
   <div class="container">
-    <div class="card shadow-lg border-0 mb-5">
-      <div class="card-header text-white text-center">
-        <h2 class="mb-0">
+    <div class="card shadow-lg border-0 rounded-3">
+      <div class="card-header bg-primary text-white py-4">
+        <h2 class="mb-0 text-center fw-light">
           <i class="fas fa-file-invoice me-2"></i>
           Payment Form
         </h2>
@@ -10,14 +10,13 @@
       
       <div class="card-body p-4 p-md-5">
         <div *ngFor="let section of formConfig?.sections" class="mb-5">
-          <h3 class="section-title">{{ section.title }}</h3>
+          <h3 class="section-title border-bottom pb-2 mb-4 fw-normal text-primary">{{ section.title }}</h3>
           
           <form [formGroup]="forms[section.section]" class="row g-4">
             <div *ngFor="let field of section.fields" class="col-md-4">
               <div class="mb-3">
-
                 <!-- Label -->
-                <label for="{{ field.field }}" class="form-label">
+                <label for="{{ field.field }}" class="form-label text-muted small text-uppercase">
                   {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
                 </label>
 
@@ -28,15 +27,15 @@
                   [required]="field.required"
                   [pattern]="field.pattern || null"
                   type="text"
-                  class="form-control" />
+                  class="form-control shadow-sm" />
 
                 <!-- Label Display -->
-                <div *ngIf="field.type === 'label'">
-                  <p class="form-control-plaintext fw-bold">{{ field.value }}</p>
+                <div *ngIf="field.type === 'label'" class="p-2 bg-light rounded">
+                  <p class="form-control-plaintext fw-semibold mb-0">{{ field.value }}</p>
                 </div>
 
                 <!-- Lookup -->
-                <div *ngIf="field.type === 'lookup'" class="input-group">
+                <div *ngIf="field.type === 'lookup'" class="input-group shadow-sm">
                   <input [formControlName]="field.field"
                     [id]="field.field"
                     [required]="field.required"
@@ -44,7 +43,7 @@
                     class="form-control"
                     (click)="openLookupModal(field, section)" readonly />
                   <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
-                    🔍
+                    <i class="fas fa-search"></i>
                   </button>
                 </div>
 
@@ -53,21 +52,21 @@
                   [formControlName]="field.field"
                   [id]="field.field"
                   type="date"
-                  class="form-control" />
+                  class="form-control shadow-sm" />
 
                 <!-- Checkbox -->
                 <div class="form-check" *ngIf="field.type === 'checkbox'">
                   <input [formControlName]="field.field"
                     [id]="field.field"
                     type="checkbox"
-                    class="form-check-input" />
+                    class="form-check-input shadow-sm" />
                 </div>
 
                 <!-- Dropdown -->
                 <select *ngIf="field.type === 'dropdown'"
                   [formControlName]="field.field"
                   [id]="field.field"
-                  class="form-select">
+                  class="form-select shadow-sm">
                   <option value="" disabled selected>-- Select --</option>
                   <option *ngFor="let option of field.options" [value]="option.value">
                     {{ option.label }}
@@ -78,11 +77,11 @@
                 <textarea *ngIf="field.type === 'textarea'"
                   [formControlName]="field.field"
                   [id]="field.field"
-                  class="form-control"></textarea>
+                  class="form-control shadow-sm"></textarea>
 
                 <!-- Error Message -->
                 <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
-                  class="text-danger small mt-1">
+                  class="text-danger small mt-2">
                   <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
                     {{ field.label }} is required.
                   </small>
@@ -90,19 +89,18 @@
                     Invalid format for {{ field.label }}.
                   </small>
                 </div>
-
               </div>
             </div>
           </form>
         </div>
       </div>
 
-      <div class="card-footer d-flex justify-content-end gap-3 p-4">
-        <button class="btn btn-success" (click)="onSubmit()" [disabled]="!isFormValid()">
-          <i class="fas fa-check me-2"></i>Submit
-        </button>
-        <button class="btn btn-outline-secondary" (click)="onCancel()">
+      <div class="card-footer d-flex justify-content-end gap-3 p-4 bg-light">
+        <button class="btn btn-outline-secondary px-4" (click)="onCancel()">
           <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button class="btn btn-primary px-4" (click)="onSubmit()" [disabled]="!isFormValid()">
+          <i class="fas fa-check me-2"></i>Submit
         </button>
       </div>
     </div>
