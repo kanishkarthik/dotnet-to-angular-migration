@@ -6,10 +6,10 @@ from config.constants import GEMINI_API_KEY, GEMINI_MODEL, SAMPLE_METADATA_PATH
 from utils.logger import logger
 
 class GeminiService(BaseLLMService):
-    def __init__(self):
+    def __init__(self, llm_model: str):
         super().__init__()
         genai.configure(api_key=GEMINI_API_KEY)
-        self.model = genai.GenerativeModel(GEMINI_MODEL)
+        self.model = genai.GenerativeModel(llm_model)
 
     def analyze(self, content: str) -> str:
         logger.info("Starting Gemini analysis")

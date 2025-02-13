@@ -43,14 +43,23 @@
                             </div>
                         </div>
                         
-                        <!-- Select AI Model -->
-                        <div class="mb-3">
-                            <label for="ai_model" class="form-label"><i class="fas fa-brain me-2"></i>Select AI Model</label>
-                            <select class="form-control" id="ai_model" name="ai_model" required>
-                                <option value="groq">Groq</option>
-                                <option value="groq_ingest">Groq Ingest</option>
-                                <option value="gemini">Gemini</option>
-                            </select>
+                        <!-- AI Model Selection Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="ai_model" class="form-label"><i class="fas fa-brain me-2"></i>AI Model</label>
+                                <select class="form-control" id="ai_model" name="ai_model" required>
+                                    <option value="" selected disabled>Select AI Model</option>
+                                    <option value="groq">Groq</option>
+                                    <option value="groq_ingest">Groq Ingest</option>
+                                    <option value="gemini">Gemini</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="llm_model" class="form-label"><i class="fas fa-microchip me-2"></i>LLM Model</label>
+                                <select class="form-control" id="llm_model" name="llm_model" required disabled>
+                                    <option value="" selected disabled>Select AI Model first</option>
+                                </select>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100"><i class="fas fa-cogs me-2"></i>Generate Metadata</button>

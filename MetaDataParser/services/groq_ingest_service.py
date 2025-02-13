@@ -24,15 +24,15 @@ def get_sample_metadata() -> str:
     return metadata_structure
 
 class GroqIngestService(BaseLLMService):
-    def __init__(self):
+    def __init__(self, llm_model: str):
         logger.info("Initializing GroqIngestService")
         super().__init__()
-        self.llm = Groq(model=GROQ_LARGE_LANGUAGE_MODEL, api_key=GROQ_API_KEY)
+        self.llm = Groq(model=llm_model, api_key=GROQ_API_KEY)
         self.embed_model = resolve_embed_model("local:BAAI/bge-small-en-v1.5")
         self._setup_settings()
 
     def _setup_settings(self):
-        logger.debug("Setting up Groq Ingest settings")
+        logger.info("Setting up Groq Ingest settings")
         Settings.llm = self.llm
         Settings.num_output = 250
         Settings.embed_model = self.embed_model
@@ -46,9 +46,13 @@ class GroqIngestService(BaseLLMService):
                 f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
             )
             
-            query = f"{base_query} Use the following sample structure as reference: {metadata_structure} but return empty json(example: {}) when no configuration found for {country_code} country and {payment_method} payment method and give only necessary fields only when it has value"
+            query = (
+                f"{base_query} Use the following sample structure as reference: {metadata_structure} "
+                f"but return empty json(example: {{}}) when no configuration found for {country_code} country "
+                f"and {payment_method} payment method and give only necessary fields only when it has value"
+            )
 
-            logger.debug(f"Loading documents from {ASPNETMVC_APP_PATH}")
+            logger.info(f"Loading documents from {ASPNETMVC_APP_PATH}")
             documents = SimpleDirectoryReader(
                 ASPNETMVC_APP_PATH,
                 required_exts=[".cs"],

@@ -24,6 +24,7 @@ def generate_metadata():
     country_code = request.form.get("country_code")
     payment_method = request.form.get("payment_method")
     ai_model = request.form.get("ai_model")
+    llm_model = request.form.get("llm_model")
 
     logger.info(f"Request parameters - Country: {country_code}, Payment Method: {payment_method}, AI Model: {ai_model}")
 
@@ -32,7 +33,7 @@ def generate_metadata():
         raise ValueError("Country code, payment method, and AI model are required!")
 
     try:
-        metadata = metadata_generator.generate(country_code, payment_method, ai_model)
+        metadata = metadata_generator.generate(country_code, payment_method, ai_model, llm_model)
         logger.info("Successfully generated metadata,"+metadata)
         return jsonify({"metadata": metadata})
     except Exception as e:

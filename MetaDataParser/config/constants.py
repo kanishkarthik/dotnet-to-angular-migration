@@ -1,7 +1,8 @@
 import os
 
 # Groq API Key and Endpoint
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
+# "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"
 
 # Groq (LLM)
 GROQ_LARGE_LANGUAGE_MODEL = "llama-3.3-70b-versatile"

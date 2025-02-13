@@ -6,9 +6,10 @@ from config.constants import GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL, SAMPLE_MET
 from utils.logger import logger
 
 class GroqService(BaseLLMService):
-    def __init__(self):
+    def __init__(self, llm_model: str):
         super().__init__()
         self.client = Groq(api_key=GROQ_API_KEY)
+        self.llm_model = llm_model
 
     def analyze(self, content: str) -> str:
         logger.info("Starting Groq analysis")
@@ -25,7 +26,7 @@ class GroqService(BaseLLMService):
             logger.info(f"Sending request to Groq API with content length: {len(content)}")
             response = self.client.chat.completions.create(
                 messages=[{"role": "user", "content": full_prompt}],
-                model=GROQ_LARGE_LANGUAGE_MODEL,
+                model=self.llm_model,
             )
             logger.info("Successfully received response from Groq API")
             logger.info(f"Raw response from Groq: {response.choices[0].message.content}")

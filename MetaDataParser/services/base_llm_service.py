@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import json
 import re
 from config.constants import SAMPLE_METADATA_PATH
+from utils.logger import logger
 
 class BaseLLMService(ABC):
     def __init__(self):
@@ -20,7 +21,7 @@ class BaseLLMService(ABC):
                 return cleaned_json
             except json.JSONDecodeError as e:
                 print(f"Invalid JSON: {e}")
-        print("No JSON found in the text.")
+        logger.info("No JSON found in the text.")
         return ""
 
     @abstractmethod

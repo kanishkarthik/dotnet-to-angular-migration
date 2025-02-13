@@ -12,8 +12,8 @@ class MetadataGenerator:
         self.aspnet_path = aspnet_path
         self.angular_path = angular_path
 
-    def generate(self, country_code: str, payment_method: str, ai_model: str) -> str:
-        logger.info(f"Starting metadata generation for country: {country_code}, payment method: {payment_method}, AI model: {ai_model}")
+    def generate(self, country_code: str, payment_method: str, ai_model: str, llm_model: str) -> str:
+        logger.info(f"Starting metadata generation for country: {country_code}, payment method: {payment_method}, AI model: {ai_model}, LLM model: {llm_model}")
         key = f"{country_code.lower()}_{payment_method.lower()}"
         file_content = ''
         try:
@@ -24,8 +24,10 @@ class MetadataGenerator:
                     raise ValueError(f"No configuration found for {key}")
 
                 file_content = self._read_cs_file(config.get("config_path"))
-            metadata = self._analyze_content(file_content, ai_model, country_code, payment_method)
-            if metadata != '{}':
+            metadata = self._analyze_content(file_content, ai_model, llm_model, country_code, payment_method)
+            logger.info(f"Generated metadata: {metadata}")
+            # check metadata is empty string or empty json object
+            if metadata and metadata.strip() != "{}":
                 self._save_metadata(key, metadata)
                 logger.info(f"Successfully generated metadata for {key}")
             else:
@@ -43,14 +45,14 @@ class MetadataGenerator:
         with open(file_path, "r") as f:
             return f.read()
 
-    def _analyze_content(self, content: str, ai_model: str, country_code: str, payment_method: str) -> str:
+    def _analyze_content(self, content: str, ai_model: str, llm_model: str, country_code: str, payment_method: str) -> str:
         logger.info(f"Analyzing content using {ai_model}")
         if ai_model == 'groq':
-            return GroqService().analyze(content)
+            return GroqService(llm_model).analyze(content)
         elif ai_model == 'groq_ingest':
-            return GroqIngestService().analyze(country_code, payment_method)
+            return GroqIngestService(llm_model).analyze(country_code, payment_method)
         elif ai_model == 'gemini':
-            return GeminiService().analyze(content)
+            return GeminiService(llm_model).analyze(content)
         else:
             raise ValueError(f"Unsupported AI model: {ai_model}")
 
