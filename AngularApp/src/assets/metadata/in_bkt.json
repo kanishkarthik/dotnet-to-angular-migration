@@ -7,14 +7,12 @@
         {
           "field": "PaymentMethod_AccountNumber",
           "label": "Account Number",
-          "type": "label",
-          "disabled": "true"
+          "type": "label"
         },
         {
           "field": "PaymentMethod_PaymentCurrency",
           "label": "Payment Currency",
-          "type": "label",
-          "disabled": "true"
+          "type": "label"
         },
         {
           "field": "PaymentMethod_Amount",
@@ -25,14 +23,12 @@
         {
           "field": "PaymentMethod_AccountName",
           "label": "Account Name",
-          "type": "label",
-          "disabled": "true"
+          "type": "label"
         },
         {
           "field": "PaymentMethod_PaymentMethod",
           "label": "Payment Method",
-          "type": "label",
-          "disabled": "true"
+          "type": "label"
         }
       ]
     },

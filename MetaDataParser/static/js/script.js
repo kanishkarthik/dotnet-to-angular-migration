@@ -20,7 +20,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
 
         if (response.ok) {
             const data = await response.json();
-            data.metadata = data.metadata || {};
+            data.metadata = data.metadata || "{}";
             const formattedJson = JSON.stringify(JSON.parse(data.metadata, null, 2), null, 2);
             output.innerHTML = `<pre class="json-output"><code>${formattedJson}</code></pre>`;
             previewBtn.style.display = 'inline';

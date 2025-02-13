@@ -25,8 +25,11 @@ class MetadataGenerator:
 
                 file_content = self._read_cs_file(config.get("config_path"))
             metadata = self._analyze_content(file_content, ai_model, country_code, payment_method)
-            self._save_metadata(key, metadata)
-            logger.info(f"Successfully generated metadata for {key}")
+            if metadata != '{}':
+                self._save_metadata(key, metadata)
+                logger.info(f"Successfully generated metadata for {key}")
+            else:
+                logger.info(f"No metadata generated for {key}")
             return metadata
         except Exception as e:
             logger.error(f"Error generating metadata: {str(e)}")

@@ -21,6 +21,7 @@ export class InitialFormComponent {
      { name : 'Domestic Fund Transfer', code: 'DFT'},
      { name : 'Cheque', code: 'RCH'}
   ];
+  isSubmitting = false;
   constructor(private fb: FormBuilder, private router: Router) {
     this.form = this.fb.group({
       accountNumber: ['', Validators.required],
@@ -34,6 +35,7 @@ export class InitialFormComponent {
 
   onSubmit() {
     if (this.form.valid) {
+      this.isSubmitting = true;
       const formValues = this.form.value;
       const redirectData = {
         accountNumber: formValues.accountNumber,
@@ -44,7 +46,12 @@ export class InitialFormComponent {
         countryCode: formValues.countryCode        
       }
       sessionStorage.setItem('redirectData', JSON.stringify(redirectData));
-      this.router.navigate(['/dynamic-form']);
+      
+      // Simulate loading state
+      setTimeout(() => {
+        this.isSubmitting = false;
+        this.router.navigate(['/dynamic-form']);
+      }, 800);
     }
   }
   openLookupModal(field: any) {

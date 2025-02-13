@@ -46,7 +46,7 @@ class GroqIngestService(BaseLLMService):
                 f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
             )
             
-            query = f"{base_query} Use the following sample structure as reference: {metadata_structure} but return empty json when no configuration found for {country_code} country and {payment_method} payment method"
+            query = f"{base_query} Use the following sample structure as reference: {metadata_structure} but return empty json(example: {}) when no configuration found for {country_code} country and {payment_method} payment method and give only necessary fields only when it has value"
 
             logger.debug(f"Loading documents from {ASPNETMVC_APP_PATH}")
             documents = SimpleDirectoryReader(
@@ -71,16 +71,6 @@ class GroqIngestService(BaseLLMService):
                 f"2. Do not make assumptions about configurations that are not present\n"
                 f"3. If no specific configuration is found for the {country_code} country or {payment_method} payment method, return empty JSON\n"
                 f"4. Include only the fields that are explicitly configured in the code"
-                "Follow the response structure:"
-                "explaation:"
-                "---------------------\n"
-                "{response_str}\n"
-                "---------------------\n"
-                "Answer:"
-                "---------------------\n"
-                "{response_str}\n"
-                "----------------------------------\n"
-                "If you don't know the answer, please do mention : I don't know!"            
             )
             
             query_engine.update_prompts(PromptTemplate(template=template))

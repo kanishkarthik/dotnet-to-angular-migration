@@ -1,101 +1,110 @@
-<div class="container mt-5">
-  <div class="card shadow-lg border-0">
-    <div class="card-header bg-primary text-white text-center py-3">
-      <h2 class="mb-0">Dynamic Payment Form</h2>
-    </div>
-    <div class="card-body">
-      <div *ngFor="let section of formConfig?.sections" class="mb-4">
-        <h3 class="text-dark fw-bold">{{ section.title }}</h3>
-        <hr class="my-3" />
+<div class="container-fluid py-5">
+  <div class="container">
+    <div class="card shadow-lg border-0 mb-5">
+      <div class="card-header text-white text-center">
+        <h2 class="mb-0">
+          <i class="fas fa-file-invoice me-2"></i>
+          Payment Form
+        </h2>
+      </div>
+      
+      <div class="card-body p-4 p-md-5">
+        <div *ngFor="let section of formConfig?.sections" class="mb-5">
+          <h3 class="section-title">{{ section.title }}</h3>
+          
+          <form [formGroup]="forms[section.section]" class="row g-4">
+            <div *ngFor="let field of section.fields" class="col-md-4">
+              <div class="mb-3">
 
-        <form [formGroup]="forms[section.section]" class="row g-4">
-          <div *ngFor="let field of section.fields" class="col-md-4">
-            <div class="mb-3">
+                <!-- Label -->
+                <label for="{{ field.field }}" class="form-label">
+                  {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
+                </label>
 
-              <!-- Label -->
-              <label for="{{ field.field }}" class="form-label">
-                {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
-              </label>
-
-              <!-- Textbox -->
-              <input *ngIf="field.type === 'textbox'" 
-                [formControlName]="field.field"
-                [id]="field.field"
-                [required]="field.required"
-                [pattern]="field.pattern || null"
-                type="text"
-                class="form-control" />
-
-              <!-- Label Display -->
-              <div *ngIf="field.type === 'label'">
-                <p class="form-control-plaintext fw-bold">{{ field.value }}</p>
-              </div>
-
-              <!-- Lookup -->
-              <div *ngIf="field.type === 'lookup'" class="input-group">
-                <input [formControlName]="field.field"
+                <!-- Textbox -->
+                <input *ngIf="field.type === 'textbox'" 
+                  [formControlName]="field.field"
                   [id]="field.field"
                   [required]="field.required"
+                  [pattern]="field.pattern || null"
                   type="text"
-                  class="form-control"
-                  (click)="openLookupModal(field, section)" readonly />
-                <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
-                  🔍
-                </button>
-              </div>
+                  class="form-control" />
 
-              <!-- Date -->
-              <input *ngIf="field.type === 'date'"
-                [formControlName]="field.field"
-                [id]="field.field"
-                type="date"
-                class="form-control" />
+                <!-- Label Display -->
+                <div *ngIf="field.type === 'label'">
+                  <p class="form-control-plaintext fw-bold">{{ field.value }}</p>
+                </div>
 
-              <!-- Checkbox -->
-              <div class="form-check" *ngIf="field.type === 'checkbox'">
-                <input [formControlName]="field.field"
+                <!-- Lookup -->
+                <div *ngIf="field.type === 'lookup'" class="input-group">
+                  <input [formControlName]="field.field"
+                    [id]="field.field"
+                    [required]="field.required"
+                    type="text"
+                    class="form-control"
+                    (click)="openLookupModal(field, section)" readonly />
+                  <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
+                    🔍
+                  </button>
+                </div>
+
+                <!-- Date -->
+                <input *ngIf="field.type === 'date'"
+                  [formControlName]="field.field"
                   [id]="field.field"
-                  type="checkbox"
-                  class="form-check-input" />
+                  type="date"
+                  class="form-control" />
+
+                <!-- Checkbox -->
+                <div class="form-check" *ngIf="field.type === 'checkbox'">
+                  <input [formControlName]="field.field"
+                    [id]="field.field"
+                    type="checkbox"
+                    class="form-check-input" />
+                </div>
+
+                <!-- Dropdown -->
+                <select *ngIf="field.type === 'dropdown'"
+                  [formControlName]="field.field"
+                  [id]="field.field"
+                  class="form-select">
+                  <option value="" disabled selected>-- Select --</option>
+                  <option *ngFor="let option of field.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+
+                <!-- Textarea -->
+                <textarea *ngIf="field.type === 'textarea'"
+                  [formControlName]="field.field"
+                  [id]="field.field"
+                  class="form-control"></textarea>
+
+                <!-- Error Message -->
+                <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
+                  class="text-danger small mt-1">
+                  <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
+                    {{ field.label }} is required.
+                  </small>
+                  <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
+                    Invalid format for {{ field.label }}.
+                  </small>
+                </div>
+
               </div>
-
-              <!-- Dropdown -->
-              <select *ngIf="field.type === 'dropdown'"
-                [formControlName]="field.field"
-                [id]="field.field"
-                class="form-select">
-                <option value="" disabled selected>-- Select --</option>
-                <option *ngFor="let option of field.options" [value]="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-
-              <!-- Textarea -->
-              <textarea *ngIf="field.type === 'textarea'"
-                [formControlName]="field.field"
-                [id]="field.field"
-                class="form-control"></textarea>
-
-              <!-- Error Message -->
-              <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
-                class="text-danger small mt-1">
-                <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
-                  {{ field.label }} is required.
-                </small>
-                <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
-                  Invalid format for {{ field.label }}.
-                </small>
-              </div>
-
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
 
-    <div class="card-footer d-flex justify-content-end">
-      <button class="btn btn-success me-2 shadow-sm px-4" (click)="onSubmit()" [disabled]="!isFormValid()">Submit</button>
-      <button class="btn btn-outline-secondary shadow-sm px-4" (click)="onCancel()">Cancel</button>
+      <div class="card-footer d-flex justify-content-end gap-3 p-4">
+        <button class="btn btn-success" (click)="onSubmit()" [disabled]="!isFormValid()">
+          <i class="fas fa-check me-2"></i>Submit
+        </button>
+        <button class="btn btn-outline-secondary" (click)="onCancel()">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+      </div>
     </div>
   </div>
 </div>

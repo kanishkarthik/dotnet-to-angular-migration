@@ -1,0 +1,78 @@
+.container {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-floating {
+  margin-bottom: 1rem;
+  
+  input, select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      border-color: #80bdff;
+    }
+  }
+}
+
+.btn-success {
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+  }
+}
+
+.lookup-button {
+  background: none;
+  border: none;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: #0d6efd;
+    transform: scale(1.1);
+  }
+}
+
+.modal-content {
+  border-radius: 15px;
+  overflow: hidden;
+  
+  .modal-header {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+  }
+  
+  .table {
+    margin-bottom: 0;
+    
+    thead th {
+      background: #f8f9fa;
+      border-top: none;
+    }
+    
+    tbody tr {
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: #f0f7ff;
+      }
+    }
+  }
+}
+
+// Add background pattern to body
+::ng-deep body {
+  background-color: #f5f7fa;
+  background-image: linear-gradient(135deg, #f5f7fa 25%, #e4e7eb 25%, #e4e7eb 50%, #f5f7fa 50%, #f5f7fa 75%, #e4e7eb 75%, #e4e7eb 100%);
+  background-size: 20px 20px;
+}
