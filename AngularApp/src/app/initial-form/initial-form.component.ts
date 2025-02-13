@@ -18,7 +18,8 @@ export class InitialFormComponent {
   paymentMethods = [
      { name : 'Book Transfer', code: 'BKT'},
      { name : 'Cross Border Fund Transfer', code: 'CBFT'},
-     { name : 'Domestic Fund Transfer', code: 'DFT'}
+     { name : 'Domestic Fund Transfer', code: 'DFT'},
+     { name : 'Cheque', code: 'RCH'}
   ];
   constructor(private fb: FormBuilder, private router: Router) {
     this.form = this.fb.group({

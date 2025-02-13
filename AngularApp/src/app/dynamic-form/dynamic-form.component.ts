@@ -58,23 +58,23 @@ export class DynamicFormComponent implements OnInit {
       this.formConfig.sections.forEach((section: any) => {
         if (section.section.toLowerCase() == 'PaymentMethod'.toLowerCase()) {
           section.fields.forEach((field: any) => {
-            if (field.field === 'PaymentMethod') {
+            if (field.field === section.section+'_PaymentMethod') {
               field.value = redirectDataObj.paymentMethodDescription;
-            } else if (field.field === 'AccountNumber') {
+            } else if (field.field === section.section+'_AccountNumber') {
               field.value = redirectDataObj.accountNumber;
-            } else if (field.field === 'PaymentCurrency') {
+            } else if (field.field === section.section+'_PaymentCurrency') {
               field.value = redirectDataObj.currency;
-            } else if (field.field === 'AccountName') {
+            } else if (field.field === section.section+'_AccountName') {
               field.value = redirectDataObj.accountName;
             }
           });
         }
       });
-      this.forms['PaymentMethod'].get("AccountNumber")?.setValue(redirectDataObj.accountNumber);
-      this.forms['PaymentMethod'].get("AccountName")?.setValue(redirectDataObj.accountName);
-      this.forms['PaymentMethod'].get("PaymentCurrency")?.setValue(redirectDataObj.currency);
-      this.forms['PaymentMethod'].get("PaymentMethod")?.setValue(redirectDataObj.paymentMethodDescription);
-      sessionStorage.removeItem('redirectData');
+      // this.forms['PaymentMethod'].get("PaymentMethod_AccountNumber")?.setValue(redirectDataObj.accountNumber);
+      // this.forms['PaymentMethod'].get("PaymentMethod_AccountName")?.setValue(redirectDataObj.accountName);
+      // this.forms['PaymentMethod'].get("PaymentMethod_PaymentCurrency")?.setValue(redirectDataObj.currency);
+      // this.forms['PaymentMethod'].get("PaymentMethod_PaymentMethod")?.setValue(redirectDataObj.paymentMethodDescription);
+      // sessionStorage.removeItem('redirectData');
       this.setFormData({});
       this.initilizeDropdownOptions({});
       // }, (error) => {

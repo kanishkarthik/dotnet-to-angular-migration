@@ -13,12 +13,14 @@ class MetadataGenerator:
 
     def generate(self, country_code: str, payment_method: str, ai_model: str) -> str:
         key = f"{country_code.lower()}_{payment_method.lower()}"
-        config = self.config.get(key)
-        
-        if not config:
-            raise ValueError(f"No configuration found for {key}")
+        file_content = ''
+        if ai_model != 'groq_ingest':
+            config = self.config.get(key)
+            
+            if not config:
+                raise ValueError(f"No configuration found for {key}")
 
-        file_content = self._read_cs_file(config.get("config_path"))
+            file_content = self._read_cs_file(config.get("config_path"))
         metadata = self._analyze_content(file_content, ai_model, country_code, payment_method)
         
         self._save_metadata(key, metadata)

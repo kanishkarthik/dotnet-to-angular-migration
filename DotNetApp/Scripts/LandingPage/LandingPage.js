@@ -41,7 +41,7 @@ const paymentHeaderDetails = {
             types: []
         },
         {
-            code: 'EFT',
+            code: 'CBFT',
             name: 'Cross Border Funds Transfer',
             types: []
         }
@@ -128,7 +128,11 @@ initializePaymentMethods(paymentMethods);
 window.onload = function () {
     const routes = {
         'in_bkt': 'indiabkt',
-        'us_bkt': 'usbkt'
+        'in_cbft': 'indiacbft',
+        'in_rch': 'indiarch',
+        'in_dft': 'indiadft',
+
+        'us_bkt': 'usbkt',
     }
     document.getElementById('continue').addEventListener('click', function () {
         const paymentMethod = document.getElementById('PaymentMethod').value;

@@ -35,8 +35,12 @@ class GroqIngestService(BaseLLMService):
         Settings.embed_model = self.embed_model
 
     def analyze(self, country_code: str, payment_method: str) -> str:
-        query = f"Generate JSON metadata based on {country_code} and {payment_method}"
-        query = f"{query} and the sample json is {self.metadata_structure}"
+        metadata_structure = get_sample_metadata()
+        query = (
+            f"Analyze the provided ASP.NET MVC codebase and generate JSON metadata only if "
+            f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
+            f"Use the following sample structure as reference: {metadata_structure}"
+        )
 
         documents = SimpleDirectoryReader(
             ASPNETMVC_APP_PATH,
@@ -48,16 +52,22 @@ class GroqIngestService(BaseLLMService):
         query_engine = index.as_query_engine()
         
         template = (
-            "We have provided context information below. \n"
+            "Context Information:\n"
             "---------------------\n"
-            "{context_str}"
-            "\n---------------------\n"
-            "Given this information, please answer the question: {query_str}\n"
-            "If you don't know the answer, please do mention : I don't know !"
+            "{context_str}\n"
+            "---------------------\n"
+            "Task: {query_str}\n"
+            "Rules:\n"
+            "Follow these rules:\n"
+            f"1. Only include configurations that actually exist in the codebase\n"
+            f"2. Do not make assumptions about configurations that are not present\n"
+            f"3. If no specific configuration is found for the {country_code} country or {payment_method} payment method, return empty JSON\n"
+            f"4. Include only the fields that are explicitly configured in the code"
         )
         
         query_engine.update_prompts(PromptTemplate(template=template))
         response = query_engine.query(query).response
+        print(response, "response")
         return self._extract_json(response)
 
 
