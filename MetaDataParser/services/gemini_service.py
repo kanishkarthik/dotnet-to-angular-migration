@@ -3,6 +3,7 @@ import re
 import google.generativeai as genai
 from .base_llm_service import BaseLLMService
 from config.constants import GEMINI_API_KEY, GEMINI_MODEL, SAMPLE_METADATA_PATH
+from utils.logger import logger
 
 class GeminiService(BaseLLMService):
     def __init__(self):
@@ -11,9 +12,12 @@ class GeminiService(BaseLLMService):
         self.model = genai.GenerativeModel(GEMINI_MODEL)
 
     def analyze(self, content: str) -> str:
+        logger.info("Starting Gemini analysis")
         try:
-            prompt = f"""Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
-            that can be used to dynamically render fields in an Angular UI.
+            base_prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
+            that can be used to dynamically render fields in an Angular UI."""
+
+            prompt = f"""{base_prompt}
 
             The metadata format should match this structure, and you may need to consider additional UI parameters 
             that are not explicitly mentioned and provide attributes only when necessary.
@@ -25,7 +29,14 @@ class GeminiService(BaseLLMService):
             {content}
             """
 
+            logger.info(f"Sending request to Gemini API with content length: {len(content)}")
             response = self.model.generate_content(prompt)
-            return self._extract_json(response.text)
+            logger.info("Successfully received response from Gemini API")
+            logger.info(f"Raw response from Gemini: {response.text}")
+
+            result = self._extract_json(response.text)
+            logger.info("Successfully extracted JSON from response")
+            return result
         except Exception as e:
+            logger.error(f"Error in Gemini analysis: {str(e)}")
             raise RuntimeError(f"Error interacting with Gemini AI: {e}")
