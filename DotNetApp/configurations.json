@@ -2,6 +2,15 @@
   "in_bkt": {
     "config_path": "ASIA\\India\\BKT\\IndiaBKTConfiguration.cs"
   },
+  "in_dft": {
+    "config_path": "ASIA\\India\\DFT\\IndiaDFTConfiguration.cs"
+  },
+  "in_cbft": {
+    "config_path": "ASIA\\India\\CBFT\\IndiaCBFTConfiguration.cs"
+  },
+  "in_rch": {
+    "config_path": "ASIA\\India\\RCH\\IndiaRCHConfiguration.cs"
+  },
   "us_bkt": {
     "config_path": "NAM\\US\\BKT\\USBKTConfiguration.cs"
   }

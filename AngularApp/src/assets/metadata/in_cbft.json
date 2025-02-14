@@ -18,7 +18,7 @@
           "field": "PaymentMethod_Amount",
           "label": "Payment Amount",
           "type": "textbox",
-          "required": "true"
+          "required": true
         },
         {
           "field": "PaymentMethod_AccountName",
@@ -40,37 +40,37 @@
           "field": "PaymentDetails_TranRefNo",
           "label": "Transaction Reference Number",
           "type": "textbox",
-          "required": "true",
+          "required": true,
           "pattern": "[a-zA-Z0-9]+",
-          "maxLength": "10"
+          "maxLength": 20
         },
         {
           "field": "PaymentDetails_ValueDate",
           "label": "Value Date",
           "type": "date",
-          "required": "true"
+          "required": true
         },
         {
-          "field": "PaymentDetails_isConfidential",
-          "label": "Confidential",
+          "field": "PaymentDetails_isUrgent",
+          "label": "Urgent Payment",
           "type": "checkbox"
         },
         {
-          "field": "PaymentDetails_EmailAddress",
-          "label": "Email Address",
-          "type": "textbox",
-          "pattern": "^([\\w\\.\\-]+)@([\\w\\-]+)((\\.([\\w]){2,3})+)$"
-        },
-        {
-          "field": "PaymentDetails_TranTypeCode",
-          "label": "Transaction Type Code",
+          "field": "PaymentDetails_PurposeCode",
+          "label": "Purpose Code",
           "type": "lookup",
-          "required": "true"
+          "required": true
         },
         {
-          "field": "PaymentDetails_TranTypeDesc",
-          "label": "Transaction Type Description",
+          "field": "PaymentDetails_PurposeDescription",
+          "label": "Purpose Description",
           "type": "textarea"
+        },
+        {
+          "field": "PaymentDetails_RemittanceInfo",
+          "label": "Remittance Information",
+          "type": "textarea",
+          "required": true
         }
       ]
     },
@@ -82,24 +82,37 @@
           "field": "BeneficiaryDetails_BeneName",
           "label": "Beneficiary Name",
           "type": "lookup",
-          "required": "true"
+          "required": true
         },
         {
           "field": "BeneficiaryDetails_BeneAcctNo",
           "label": "Beneficiary Account Number",
           "type": "textbox",
-          "required": "true"
+          "required": true
         },
         {
-          "field": "BeneficiaryDetails_DestinationBranch",
-          "label": "Destination Branch",
+          "field": "BeneficiaryDetails_BeneBank",
+          "label": "Beneficiary Bank",
+          "type": "lookup",
+          "required": true
+        },
+        {
+          "field": "BeneficiaryDetails_BeneBankCode",
+          "label": "Beneficiary Bank Code",
+          "type": "textbox",
+          "required": true
+        },
+        {
+          "field": "BeneficiaryDetails_BeneCountry",
+          "label": "Beneficiary Country",
           "type": "dropdown",
-          "required": "true"
+          "required": true
         },
         {
           "field": "BeneficiaryDetails_AddrssLine1",
           "label": "Beneficiary Address Line 1",
-          "type": "textbox"
+          "type": "textbox",
+          "required": true
         },
         {
           "field": "BeneficiaryDetails_AddrssLine2",

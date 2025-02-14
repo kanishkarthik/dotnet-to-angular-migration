@@ -56,7 +56,7 @@ export class DynamicFormComponent implements OnInit {
       this.initializeForms();
       //this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
       this.formConfig.sections.forEach((section: any) => {
-        if (section.section.toLowerCase() == 'PaymentMethod'.toLowerCase()) {
+        if (section.section.toLowerCase().indexOf('PaymentMethod'.toLowerCase()) !== -1) {
           section.fields.forEach((field: any) => {
             if (field.field === section.section+'_PaymentMethod') {
               field.value = redirectDataObj.paymentMethodDescription;
@@ -70,10 +70,6 @@ export class DynamicFormComponent implements OnInit {
           });
         }
       });
-      // this.forms['PaymentMethod'].get("PaymentMethod_AccountNumber")?.setValue(redirectDataObj.accountNumber);
-      // this.forms['PaymentMethod'].get("PaymentMethod_AccountName")?.setValue(redirectDataObj.accountName);
-      // this.forms['PaymentMethod'].get("PaymentMethod_PaymentCurrency")?.setValue(redirectDataObj.currency);
-      // this.forms['PaymentMethod'].get("PaymentMethod_PaymentMethod")?.setValue(redirectDataObj.paymentMethodDescription);
       // sessionStorage.removeItem('redirectData');
       this.setFormData({});
       this.initilizeDropdownOptions({});
@@ -105,7 +101,9 @@ export class DynamicFormComponent implements OnInit {
       section.fields.forEach((field: any) => {
         const validators = [];
         if (field.required == "true") validators.push(Validators.required);
-        if (field.pattern) validators.push(Validators.pattern(`^${field.pattern}$`));
+        if (field.pattern) validators.push(Validators.pattern(`^${field.pattern}$`));``
+        if (field.maxLength) validators.push(Validators.maxLength(parseInt(field.maxLength)));
+        if (field.minLength) validators.push(Validators.minLength(parseInt(field.minLength)));        
         group[field.field] = new FormControl({ value: '', disabled: field.disabled == "true" || false }, validators);
       });
       this.forms[section.section] = this.fb.group(group);

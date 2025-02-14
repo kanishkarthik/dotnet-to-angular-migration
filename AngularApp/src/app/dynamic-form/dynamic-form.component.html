@@ -85,9 +85,15 @@
                   <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
                     {{ field.label }} is required.
                   </small>
-                  <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
+                    <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
                     Invalid format for {{ field.label }}.
-                  </small>
+                    </small>
+                    <small *ngIf="forms[section.section].get(field.field)?.errors?.['minlength']">
+                    {{ field.label }} must be at least {{ field.minLength }} characters long.
+                    </small>
+                    <small *ngIf="forms[section.section].get(field.field)?.errors?.['maxlength']">
+                    {{ field.label }} cannot be more than {{ field.maxLength }} characters long.
+                    </small>
                 </div>
               </div>
             </div>

@@ -46,7 +46,8 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
                 .Name("Transaction Reference Number")
                 .Type("textbox")
                 .Required(true)
-                .Pattern("[a-zA-Z0-9]+");
+                .Pattern("[a-zA-Z0-9]+")
+                .MaxLength(10);
 
             ConfigureModel(model => model.PaymentDetails.ValueDate)
                 .Name("Value Date")
@@ -59,7 +60,8 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
 
             ConfigureModel(model => model.PaymentDetails.EmailAddress)
                .Name("Email Address")
-               .Type("textbox");
+               .Type("textbox")
+               .Pattern(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
 
             ConfigureModel(model => model.PaymentDetails.TranTypeCode)
                 .Name("Transaction Type Code")

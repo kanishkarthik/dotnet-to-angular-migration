@@ -46,7 +46,8 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.CBFT
                 .Name("Transaction Reference Number")
                 .Type("textbox")
                 .Required(true)
-                .Pattern("[a-zA-Z0-9]+");
+                .Pattern("[a-zA-Z0-9]+")
+                .MaxLength(20);
 
             ConfigureModel(model => model.PaymentDetails.ValueDate)
                 .Name("Value Date")
