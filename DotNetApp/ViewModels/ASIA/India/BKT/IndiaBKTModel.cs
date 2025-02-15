@@ -1,6 +1,4 @@
-﻿using Application.ViewModels.Common;
-using DotNetApp.ViewModels.Base;
-using DotNetApp.ViewModels.NAM.US.BKT;
+﻿using DotNetApp.ViewModels.Base;
 
 namespace Application.ViewModels.ASIA.India.BKT
 {

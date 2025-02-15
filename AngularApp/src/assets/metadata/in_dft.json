@@ -1,0 +1,161 @@
+{
+  "sections": [
+    {
+      "section": "PaymentMethod",
+      "title": "Payment Method",
+      "fields": [
+        {
+          "field": "PaymentMethod_AccountNumber",
+          "label": "Account Number",
+          "type": "label"
+        },
+        {
+          "field": "PaymentMethod_PaymentCurrency",
+          "label": "Payment Currency",
+          "type": "label"
+        },
+        {
+          "field": "PaymentMethod_Amount",
+          "label": "Payment Amount",
+          "type": "textbox",
+          "required": true
+        },
+        {
+          "field": "PaymentMethod_AccountName",
+          "label": "Account Name",
+          "type": "label"
+        },
+        {
+          "field": "PaymentMethod_PaymentMethod",
+          "label": "Payment Method",
+          "type": "label"
+        }
+      ]
+    },
+    {
+      "section": "TransferDetails",
+      "title": "Transfer Details",
+      "fields": [
+        {
+          "field": "TransferDetails_TransferReferenceNumber",
+          "label": "Transfer Reference Number",
+          "type": "textbox",
+          "required": true
+        },
+        {
+          "field": "TransferDetails_TransferDate",
+          "label": "Transfer Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "field": "TransferDetails_TransferType",
+          "label": "Transfer Date", 
+          "type": "dropdown",
+          "required": true
+        },
+        {
+          "field": "TransferDetails_PaymentPurpose",
+          "label": "Payment Purpose",
+          "type": "dropdown",
+          "required": true
+        },
+        {
+          "field": "TransferDetails_Remarks",
+          "label": "Remarks",
+          "type": "textarea",
+          "maxLength": 100
+        }
+      ]
+    },
+    {
+      "section": "Beneficiary",
+      "title": "Beneficiary",
+      "fields": [
+        {
+          "field": "Beneficiary_BeneficiaryName",
+          "label": "Beneficiary Name",
+          "type": "textbox",
+          "required": true,
+          "maxLength": 50
+        },
+        {
+          "field": "Beneficiary_BeneficiaryAccountNumber",
+          "label": "Beneficiary Account Number",
+          "type": "textbox",
+          "required": true,
+          "pattern": "^\\d{8,20}$"
+        },
+        {
+          "field": "Beneficiary_BeneficiaryBankName",
+          "label": "Beneficiary Bank",
+          "type": "dropdown",
+          "required": true
+        },
+        {
+          "field": "Beneficiary_BeneficiaryIFSCCode",
+          "label": "IFSC Code",
+          "type": "textbox",
+          "required": true,
+          "pattern": "^[A-Z]{4}0[A-Z0-9]{6}$"
+        },
+        {
+          "field": "Beneficiary_BeneficiaryBankBranch",
+          "label": "Bank Branch",
+          "type": "textbox"
+        },
+        {
+          "field": "Beneficiary_BeneficiaryAddress",
+          "label": "Beneficiary Address",
+          "type": "textarea",
+          "maxLength": 200
+        }
+      ]
+    },
+    {
+      "section": "AdditionalOptions",
+      "title": "Additional Options",
+      "fields": [
+        {
+          "field": "AdditionalOptions_IsUrgentPayment",
+          "label": "Urgent Payment",
+          "type": "checkbox"
+        },
+        {
+          "field": "AdditionalOptions_SendNotificationToReceiver",
+          "label": "Send Notification",
+          "type": "checkbox"
+        },
+        {
+          "field": "AdditionalOptions_ReceiverEmail",
+          "label": "Receiver Email",
+          "type": "textbox",
+          "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        },
+        {
+          "field": "AdditionalOptions_ReceiverMobile",
+          "label": "Receiver Mobile",
+          "type": "textbox",
+          "pattern": "^\\+?[0-9]{10,12}$"
+        },
+        {
+          "field": "AdditionalOptions_TransferMode",
+          "label": "Transfer Mode",
+          "type": "dropdown",
+          "required": true
+        },
+        {
+          "field": "AdditionalOptions_ScheduleType",
+          "label": "Schedule Type",
+          "type": "dropdown",
+          "required": true
+        },
+        {
+          "field": "AdditionalOptions_FrequencyType",
+          "label": "Frequency",
+          "type": "dropdown"
+        }
+      ]
+    }
+  ]
+}

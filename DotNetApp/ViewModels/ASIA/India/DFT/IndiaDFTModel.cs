@@ -1,9 +1,10 @@
+using DotNetApp.ViewModels.Base;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.ViewModels.ASIA.India.DFT
 {
-    public class IndiaDFTModel
+    public class IndiaDFTModel : BaseAppModel
     {
         public TransferDetailsSection TransferDetails { get; set; }
         public BeneficiarySection Beneficiary { get; set; }
@@ -12,12 +13,7 @@ namespace Application.ViewModels.ASIA.India.DFT
 
     public class TransferDetailsSection
     {
-        [Required]
-        public string DebitAccountNumber { get; set; }
-        [Required]
-        public decimal TransferAmount { get; set; }
-        public string TransferCurrency { get; set; } = "INR";
-        [Required]
+        public string TransferReferenceNumber { get; set; }
         public DateTime TransferDate { get; set; }
         public string TransferType { get; set; }
         public string PaymentPurpose { get; set; }

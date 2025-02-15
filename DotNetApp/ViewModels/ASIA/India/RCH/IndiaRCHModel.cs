@@ -1,22 +1,13 @@
 using Application.ViewModels.Common;
+using DotNetApp.ViewModels.Base;
 using System;
 
 namespace Application.ViewModels.ASIA.India.RCH
 {
-    public class IndiaRCHModel
+    public class IndiaRCHModel : BaseAppModel
     {
-        public PaymentMethodSection PaymentMethod { get; set; }
         public PaymentDetailsSection PaymentDetails { get; set; }
         public ChequeDetailsSection ChequeDetails { get; set; }
-    }
-
-    public class PaymentMethodSection
-    {
-        public string AccountNumber { get; set; }
-        public string PaymentCurrency { get; set; }
-        public decimal Amount { get; set; }
-        public string AccountName { get; set; }
-        public string PaymentMethod { get; set; }
     }
 
     public class PaymentDetailsSection

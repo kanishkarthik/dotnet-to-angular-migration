@@ -1,9 +1,9 @@
 using Application.ViewModels.ASIA.India.DFT;
-using DotNetApp.Core.Configuration;
+using DotNetApp.ViewConfigurations.Base;
 
 namespace DotNetApp.ViewConfigurations.ASIA.India.DFT
 {
-    public class IndiaDFTConfiguration : PropertyConfiguration<IndiaDFTModel>
+    public class IndiaDFTConfiguration : BaseAppViewConfigurations<IndiaDFTModel>
     {
         public IndiaDFTConfiguration(IndiaDFTModel model) : base(model)
         {
@@ -11,6 +11,7 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.DFT
 
         public override void ConfigureModel()
         {
+            ConfigurePaymentMethod();
             ConfigureTransferDetails();
             ConfigureBeneficiary();
             ConfigureAdditionalOptions();
@@ -18,25 +19,19 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.DFT
 
         private void ConfigureTransferDetails()
         {
-            ConfigureModel(model => model.TransferDetails.DebitAccountNumber)
-                .Name("Debit Account Number")
-                .Type("dropdown")
-                .Required(true);
-
-            ConfigureModel(model => model.TransferDetails.TransferAmount)
-                .Name("Transfer Amount")
+            ConfigureModel(model => model.TransferDetails.TransferReferenceNumber)
+                .Name("Transfer Reference Number")
                 .Type("textbox")
-                .Required(true)
-                .Pattern(@"^\d+(\.\d{1,2})?$");
-
-            ConfigureModel(model => model.TransferDetails.TransferCurrency)
-                .Name("Transfer Currency")
-                .Type("label");
-                //.DefaultValue("INR");
+                .Required(true);
 
             ConfigureModel(model => model.TransferDetails.TransferDate)
                 .Name("Transfer Date")
                 .Type("date")
+                .Required(true);
+
+            ConfigureModel(model => model.TransferDetails.TransferType)
+                .Name("Transfer Date")
+                .Type("dropdown")
                 .Required(true);
 
             ConfigureModel(model => model.TransferDetails.PaymentPurpose)
@@ -77,7 +72,7 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.DFT
 
             ConfigureModel(model => model.Beneficiary.BeneficiaryBankBranch)
                 .Name("Bank Branch")
-                .Type("label");
+                .Type("textbox");
 
             ConfigureModel(model => model.Beneficiary.BeneficiaryAddress)
                 .Name("Beneficiary Address")

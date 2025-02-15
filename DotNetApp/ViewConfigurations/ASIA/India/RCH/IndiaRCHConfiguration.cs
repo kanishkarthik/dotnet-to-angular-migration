@@ -1,9 +1,9 @@
 using Application.ViewModels.ASIA.India.RCH;
-using DotNetApp.Core.Configuration;
+using DotNetApp.ViewConfigurations.Base;
 
 namespace DotNetApp.ViewConfigurations.ASIA.India.RCH
 {
-    public class IndiaRCHConfiguration : PropertyConfiguration<IndiaRCHModel>
+    public class IndiaRCHConfiguration : BaseAppViewConfigurations<IndiaRCHModel>
     {
         public IndiaRCHConfiguration(IndiaRCHModel model) : base(model)
         {
@@ -14,31 +14,6 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.RCH
             ConfigurePaymentMethod();
             ConfigurePaymentDetails();
             ConfigureChequeDetails();
-        }
-
-        private void ConfigurePaymentMethod()
-        {
-            ConfigureModel(model => model.PaymentMethod.AccountNumber)
-                .Name("Account Number")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentCurrency)
-                .Name("Payment Currency")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.Amount)
-                .Name("Payment Amount")
-                .Type("textbox")
-                .Required(true)
-                .Pattern(@"^\d+(\.\d{1,2})?$");
-
-            ConfigureModel(model => model.PaymentMethod.AccountName)
-                .Name("Account Name")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentMethod)
-                .Name("Payment Method")
-                .Type("label");
         }
 
         private void ConfigurePaymentDetails()
