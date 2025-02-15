@@ -23,3 +23,6 @@ ANGULAR_APP_METADATA_PATH = os.path.join(ROOT_PATH, "AngularApp", "src", "assets
 ASPNETMVC_CONFIG_FILE = os.path.join(ROOT_PATH, "DotNetApp", "configurations.json")
 ASPNETMVC_APP_PATH = os.path.join(ROOT_PATH, "DotNetApp", "ViewConfigurations")
 SAMPLE_METADATA_PATH = os.path.join(ROOT_PATH,'MetaDataParser', 'config', 'sample_metadata.json')
+
+# Index Storage Path
+INDEX_STORAGE_PATH = os.path.join(ROOT_PATH, 'storage', 'vector_index')

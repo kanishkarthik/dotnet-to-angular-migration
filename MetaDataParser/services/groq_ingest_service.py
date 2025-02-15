@@ -6,8 +6,11 @@ from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core import PromptTemplate, Settings
 from llama_index.core.embeddings import resolve_embed_model
 import os
+from pathlib import Path
+from llama_index.core.storage import StorageContext
+from llama_index.core import load_index_from_storage
 
-from config.constants import ASPNETMVC_APP_PATH, GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL, ROOT_PATH, SAMPLE_METADATA_PATH
+from config.constants import ASPNETMVC_APP_PATH, GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL, ROOT_PATH, SAMPLE_METADATA_PATH, INDEX_STORAGE_PATH
 from .base_llm_service import BaseLLMService
 from utils.logger import logger
 
@@ -30,12 +33,38 @@ class GroqIngestService(BaseLLMService):
         self.llm = Groq(model=llm_model, api_key=GROQ_API_KEY)
         self.embed_model = resolve_embed_model("local:BAAI/bge-small-en-v1.5")
         self._setup_settings()
+        self.index = self._load_or_create_index()
+
+        self._setup_settings()
 
     def _setup_settings(self):
         logger.info("Setting up Groq Ingest settings")
         Settings.llm = self.llm
         Settings.num_output = 250
         Settings.embed_model = self.embed_model
+
+    def _load_or_create_index(self):
+        logger.info("Checking for existing index")
+        try:
+            if os.path.exists(INDEX_STORAGE_PATH):
+                logger.info("Loading existing index")
+                storage_context = StorageContext.from_defaults(persist_dir=INDEX_STORAGE_PATH)
+                return load_index_from_storage(storage_context)
+            
+            logger.info("No existing index found, creating new one")
+            documents = SimpleDirectoryReader(
+                ASPNETMVC_APP_PATH,
+                required_exts=[".cs"],
+                recursive=True
+            ).load_data()
+            
+            index = VectorStoreIndex.from_documents(documents)
+            logger.info("Persisting index for future use")
+            index.storage_context.persist(persist_dir=INDEX_STORAGE_PATH)
+            return index
+        except Exception as e:
+            logger.error(f"Error in index loading/creation: {str(e)}")
+            raise
 
     def analyze(self, country_code: str, payment_method: str) -> str:
         logger.info(f"Starting Groq Ingest analysis for country: {country_code}, payment method: {payment_method}")
@@ -52,16 +81,7 @@ class GroqIngestService(BaseLLMService):
                 f"and {payment_method} payment method and give only necessary fields only when it has value"
             )
 
-            logger.info(f"Loading documents from {ASPNETMVC_APP_PATH}")
-            documents = SimpleDirectoryReader(
-                ASPNETMVC_APP_PATH,
-                required_exts=[".cs"],
-                recursive=True
-            ).load_data()
-
-            logger.info("Creating vector store index")
-            index = VectorStoreIndex.from_documents(documents)
-            query_engine = index.as_query_engine()
+            query_engine = self.index.as_query_engine()
             
             template = (
                 "Context Information:\n"
