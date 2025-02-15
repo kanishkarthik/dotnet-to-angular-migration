@@ -5,7 +5,7 @@ namespace Application.ViewModels.NAM.US.CBFT
 {
     public class USCBFTModel
     {
-        public PaymentMethodSection PaymentMethod { get; set; }
+        public PaymentMethodModel PaymentMethod { get; set; }
         public USPaymentDetailsSection PaymentDetails { get; set; }
         public USBeneficiaryDetailsSection BeneficiaryDetails { get; set; }
     }

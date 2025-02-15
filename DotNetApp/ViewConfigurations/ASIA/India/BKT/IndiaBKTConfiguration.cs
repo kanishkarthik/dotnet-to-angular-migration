@@ -1,9 +1,9 @@
 ﻿using Application.ViewModels.ASIA.India.BKT;
-using DotNetApp.Core.Configuration;
+using DotNetApp.ViewConfigurations.Base;
 
 namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
 {
-    public class IndiaBKTConfiguration : PropertyConfiguration<IndiaBKTModel>
+    public class IndiaBKTConfiguration : BaseAppViewConfigurations<IndiaBKTModel>
     {
         public IndiaBKTConfiguration(IndiaBKTModel model) : base(model)
         {
@@ -14,30 +14,7 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
             ConfigurePaymentMethod();
             ConfigurePaymentDetails();
             ConfigureBeneficiaryDetails();
-        }
-
-        public void ConfigurePaymentMethod()
-        {
-            ConfigureModel(model => model.PaymentMethod.AccountNumber)
-                .Name("Account Number")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentCurrency)
-                .Name("Payment Currency")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.Amount)
-                .Name("Payment Amount")
-                .Type("textbox")
-                .Required(true);
-
-            ConfigureModel(model => model.PaymentMethod.AccountName)
-                .Name("Account Name")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentMethod)
-                .Name("Payment Method")
-                .Type("label");
+            ConfigureOrderingPartyDetails();
         }
 
         public void ConfigurePaymentDetails()
@@ -46,8 +23,8 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
                 .Name("Transaction Reference Number")
                 .Type("textbox")
                 .Required(true)
-                .Pattern("[a-zA-Z0-9]+")
-                .MaxLength(10);
+                .MaxLength(10)
+                .Pattern("[a-zA-Z0-9]+");
 
             ConfigureModel(model => model.PaymentDetails.ValueDate)
                 .Name("Value Date")
@@ -61,7 +38,7 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
             ConfigureModel(model => model.PaymentDetails.EmailAddress)
                .Name("Email Address")
                .Type("textbox")
-               .Pattern(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+               .Pattern("[a-zA-Z0-9]+@[a-zA-Z0-9]+.[a-zA-Z0-9]+");
 
             ConfigureModel(model => model.PaymentDetails.TranTypeCode)
                 .Name("Transaction Type Code")
@@ -97,6 +74,17 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
             ConfigureModel(model => model.BeneficiaryDetails.AddrssLine2)
                 .Name("Beneficiary Address Line 2")
                 .Type("textbox");      
+        }
+        public void ConfigureOrderingPartyDetails()
+        {
+            ConfigureModel(model => model.OrderingPartyDetails.Name)
+                 .Name("Ordering Party Name")
+                 .Type("textbox")
+                 .MaxLength(50);
+
+            ConfigureModel(model => model.OrderingPartyDetails.Address)
+                .Name("Ordering Party Address")
+                .Type("textarea");
         }
     }
 }

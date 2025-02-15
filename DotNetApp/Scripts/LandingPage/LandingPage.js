@@ -133,6 +133,7 @@ window.onload = function () {
         'in_dft': 'indiadft',
 
         'us_bkt': 'usbkt',
+        "us_cbft": 'uscbft',
     }
     document.getElementById('continue').addEventListener('click', function () {
         const paymentMethod = document.getElementById('PaymentMethod').value;

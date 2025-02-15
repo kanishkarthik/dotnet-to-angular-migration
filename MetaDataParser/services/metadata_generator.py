@@ -22,8 +22,8 @@ class MetadataGenerator:
                 if not config:
                     logger.error(f"No configuration found for {key}")
                     raise ValueError(f"No configuration found for {key}")
-
-                file_content = self._read_cs_file(config.get("config_path"))
+                baseConfig = self.config.get("base")
+                file_content = self._read_cs_file(baseConfig.get('config_path'), config.get("config_path"))
             metadata = self._analyze_content(file_content, ai_model, llm_model, country_code, payment_method)
             logger.info(f"Generated metadata: {metadata}")
             # check metadata is empty string or empty json object
@@ -37,20 +37,27 @@ class MetadataGenerator:
             logger.error(f"Error generating metadata: {str(e)}")
             raise
 
-    def _read_cs_file(self, relative_path: str) -> str:
-        logger.info(f"Reading C# file from: {relative_path}")
+    def _read_cs_file(self, baseconfig_relative_path, relative_path: str) -> str:
+        logger.info(f"Reading C# file from: {baseconfig_relative_path} & {relative_path}")
+        base_file_path = os.path.join(self.aspnet_path, baseconfig_relative_path)
         file_path = os.path.join(self.aspnet_path, relative_path)
+        filecontent = ''
+        if not os.path.exists(base_file_path):
+            raise FileNotFoundError(f"Configuration file not found at {base_file_path}")
+        with open(base_file_path, "r") as f:
+           filecontent = f.read()
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Configuration file not found at {file_path}")
         with open(file_path, "r") as f:
-            return f.read()
-
+            filecontent = filecontent + f.read()
+        return filecontent
+    
     def _analyze_content(self, content: str, ai_model: str, llm_model: str, country_code: str, payment_method: str) -> str:
         logger.info(f"Analyzing content using {ai_model}")
         if ai_model == 'groq':
             return GroqService(llm_model).analyze(content)
         elif ai_model == 'groq_ingest':
-            return GroqIngestService(llm_model).analyze(country_code, payment_method)
+            return GroqIngestService(llm_model,True).analyze(country_code, payment_method)
         elif ai_model == 'gemini':
             return GeminiService(llm_model).analyze(content)
         else:

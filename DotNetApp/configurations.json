@@ -1,4 +1,7 @@
 {
+  "base": {
+    "config_path": "Base\\BaseAppViewConfigurations.cs"
+  },
   "in_bkt": {
     "config_path": "ASIA\\India\\BKT\\IndiaBKTConfiguration.cs"
   },

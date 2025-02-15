@@ -41,8 +41,8 @@
           "label": "Transaction Reference Number",
           "type": "textbox",
           "required": "true",
-          "pattern": "[a-zA-Z0-9]+",
-          "maxLength": "10"
+          "maxLength": "10",
+          "pattern": "[a-zA-Z0-9]+"
         },
         {
           "field": "PaymentDetails_ValueDate",
@@ -59,7 +59,7 @@
           "field": "PaymentDetails_EmailAddress",
           "label": "Email Address",
           "type": "textbox",
-          "pattern": "^([\\w\\.\\-]+)@([\\w\\-]+)((\\.([\\w]){2,3})+)$"
+          "pattern": "[a-zA-Z0-9]+@[a-zA-Z0-9]+.[a-zA-Z0-9]+"
         },
         {
           "field": "PaymentDetails_TranTypeCode",
@@ -105,6 +105,23 @@
           "field": "BeneficiaryDetails_AddrssLine2",
           "label": "Beneficiary Address Line 2",
           "type": "textbox"
+        }
+      ]
+    },
+    {
+      "section": "OrderingPartyDetails",
+      "title": "Ordering Party Details",
+      "fields": [
+        {
+          "field": "OrderingPartyDetails_Name",
+          "label": "Ordering Party Name",
+          "type": "textbox",
+          "maxLength": "50"
+        },
+        {
+          "field": "OrderingPartyDetails_Address",
+          "label": "Ordering Party Address",
+          "type": "textarea"
         }
       ]
     }

@@ -24,8 +24,7 @@ namespace DotNetApp.ViewConfigurations.NAM.US.CBFT
 
             ConfigureModel(model => model.PaymentMethod.PaymentCurrency)
                 .Name("Payment Currency")
-                .Type("label")
-                .DefaultValue("USD");
+                .Type("label");
 
             ConfigureModel(model => model.PaymentMethod.Amount)
                 .Name("Payment Amount")
@@ -67,8 +66,8 @@ namespace DotNetApp.ViewConfigurations.NAM.US.CBFT
 
             ConfigureModel(model => model.PaymentDetails.IntermediaryBankCode)
                 .Name("Intermediary Bank Code")
-                .Type("textbox")
-                .DependsOn("HasIntermediaryBank");
+                .Type("textbox");
+                //.DependsOn("HasIntermediaryBank");
         }
 
         private void ConfigureBeneficiaryDetails()

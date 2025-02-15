@@ -27,15 +27,31 @@ def get_sample_metadata() -> str:
     return metadata_structure
 
 class GroqIngestService(BaseLLMService):
-    def __init__(self, llm_model: str):
+    def __init__(self, llm_model: str, clear_index: bool = False):
         logger.info("Initializing GroqIngestService")
         super().__init__()
         self.llm = Groq(model=llm_model, api_key=GROQ_API_KEY)
         self.embed_model = resolve_embed_model("local:BAAI/bge-small-en-v1.5")
         self._setup_settings()
+        
+        if clear_index:
+            self.clear_index()
+            
         self.index = self._load_or_create_index()
 
-        self._setup_settings()
+    def clear_index(self):
+        """Clear the existing index storage"""
+        logger.info("Attempting to clear existing index")
+        try:
+            if os.path.exists(INDEX_STORAGE_PATH):
+                import shutil
+                shutil.rmtree(INDEX_STORAGE_PATH)
+                logger.info("Successfully cleared existing index")
+            else:
+                logger.info("No existing index found to clear")
+        except Exception as e:
+            logger.error(f"Error clearing index: {str(e)}")
+            raise RuntimeError(f"Failed to clear index: {e}")
 
     def _setup_settings(self):
         logger.info("Setting up Groq Ingest settings")
@@ -94,7 +110,7 @@ class GroqIngestService(BaseLLMService):
                 f"1. Only include configurations that actually exist in the codebase\n"
                 f"2. Do not make assumptions about configurations that are not present\n"
                 f"3. If no specific configuration is found for the {country_code} country or {payment_method} payment method, return empty JSON\n"
-                f"4. Include only the fields that are explicitly configured in the code"
+                f"4. Include only the fields that are explicitly configured in the code and dont miss any fields and their respective configurations\n"
             )
             
             query_engine.update_prompts(PromptTemplate(template=template))
