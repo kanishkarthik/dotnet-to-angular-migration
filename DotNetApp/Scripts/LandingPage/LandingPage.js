@@ -20,7 +20,7 @@ const paymentHeaderDetails = {
             optionsName: ['number', 'name', 'currency', 'countryCode'],
             optionsValue: [
                 { number: '14447026', name: 'Account 1', currency: 'INR', countryCode: 'IN' },
-                { number: '20123456', name: 'Account 2', currency: 'US', countryCode: 'US' },
+                { number: '20123456', name: 'Account 2', currency: 'USD', countryCode: 'US' },
             ]
         }
     ],

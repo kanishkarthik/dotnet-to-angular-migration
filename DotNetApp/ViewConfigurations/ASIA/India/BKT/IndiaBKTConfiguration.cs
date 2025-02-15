@@ -11,9 +11,16 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.BKT
 
         public override void ConfigureModel()
         {
+            //Order 1
             ConfigurePaymentMethod();
+
+            //Order 2
             ConfigurePaymentDetails();
+
+            //Order 3
             ConfigureBeneficiaryDetails();
+
+            //Order 4
             ConfigureOrderingPartyDetails();
         }
 

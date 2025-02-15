@@ -11,8 +11,11 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.RCH
 
         public override void ConfigureModel()
         {
+            //Order 1
             ConfigurePaymentMethod();
+            //Order 2
             ConfigurePaymentDetails();
+            //Order 3
             ConfigureChequeDetails();
         }
 

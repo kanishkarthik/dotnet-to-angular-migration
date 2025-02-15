@@ -1,10 +1,9 @@
 ﻿using Application.ViewModels.NAM.US.BKT;
-using DotNetApp.Core.Configuration;
-using System;
+using DotNetApp.ViewConfigurations.Base;
 
 namespace DotNetApp.ViewConfigurations.NAM.US.BKT
 {
-    public class USBKTConfiguration : PropertyConfiguration<USBKTModel>
+    public class USBKTConfiguration : BaseAppViewConfigurations<USBKTModel>
     {
         public USBKTConfiguration(USBKTModel model) : base(model)
         {
@@ -12,37 +11,15 @@ namespace DotNetApp.ViewConfigurations.NAM.US.BKT
 
         public override void ConfigureModel()
         {
+            //Order 1
             ConfigurePaymentMethod();
+            //Order 2
             ConfigurePaymentDetails();
+            //Order 3
             ConfigureBeneficiaryDetails();
+            //Order 4
             ConfigureOrderingPartyDetails();
         }
-
-        
-        public void ConfigurePaymentMethod()
-        {
-            ConfigureModel(model => model.PaymentMethod.AccountNumber)
-                .Name("Account Number")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentCurrency)
-                .Name("Payment Currency")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.Amount)
-                .Name("Payment Amount")
-                .Type("textbox")
-                .Required(true);
-
-            ConfigureModel(model => model.PaymentMethod.AccountName)
-                .Name("Account Name")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentMethod)
-                .Name("Payment Method")
-                .Type("label");
-        }
-
         public void ConfigurePaymentDetails()
         {
             ConfigureModel(model => model.PaymentDetails.TranRefNo)

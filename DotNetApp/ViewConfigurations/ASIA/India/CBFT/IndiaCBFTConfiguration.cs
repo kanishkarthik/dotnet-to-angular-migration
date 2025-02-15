@@ -11,8 +11,13 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.CBFT
 
         public override void ConfigureModel()
         {
+            //Order 1
             ConfigurePaymentMethod();
+
+            //Order 2
             ConfigurePaymentDetails();
+
+            //Order 3
             ConfigureBeneficiaryDetails();
         }
 

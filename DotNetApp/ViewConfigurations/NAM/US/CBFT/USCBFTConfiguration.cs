@@ -1,9 +1,9 @@
 using Application.ViewModels.NAM.US.CBFT;
-using DotNetApp.Core.Configuration;
+using DotNetApp.ViewConfigurations.Base;
 
 namespace DotNetApp.ViewConfigurations.NAM.US.CBFT
 {
-    public class USCBFTConfiguration : PropertyConfiguration<USCBFTModel>
+    public class USCBFTConfiguration : BaseAppViewConfigurations<USCBFTModel>
     {
         public USCBFTConfiguration(USCBFTModel model) : base(model)
         {
@@ -15,23 +15,6 @@ namespace DotNetApp.ViewConfigurations.NAM.US.CBFT
             ConfigurePaymentDetails();
             ConfigureBeneficiaryDetails();
         }
-
-        private void ConfigurePaymentMethod()
-        {
-            ConfigureModel(model => model.PaymentMethod.AccountNumber)
-                .Name("Account Number")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.PaymentCurrency)
-                .Name("Payment Currency")
-                .Type("label");
-
-            ConfigureModel(model => model.PaymentMethod.Amount)
-                .Name("Payment Amount")
-                .Type("textbox")
-                .Required(true);
-        }
-
         private void ConfigurePaymentDetails()
         {
             ConfigureModel(model => model.PaymentDetails.TransactionReferenceNumber)

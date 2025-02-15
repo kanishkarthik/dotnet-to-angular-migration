@@ -1,11 +1,10 @@
-﻿using Application.ViewModels.Common;
+﻿using DotNetApp.ViewModels.Base;
 using DotNetApp.ViewModels.NAM.US.BKT;
 
 namespace Application.ViewModels.NAM.US.BKT
 {
-    public class USBKTModel
+    public class USBKTModel : BaseAppModel
     {
-        public PaymentMethodModel PaymentMethod { get; set; }
         public PaymentDetailsModel PaymentDetails { get; set; }
 
         public BeneficiaryDetailsModel BeneficiaryDetails { get; set; }

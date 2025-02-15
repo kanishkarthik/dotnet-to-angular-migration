@@ -16,5 +16,8 @@
   },
   "us_bkt": {
     "config_path": "NAM\\US\\BKT\\USBKTConfiguration.cs"
+  },
+  "us_cbft": {
+    "config_path": "NAM\\US\\CBFT\\USCBFTConfiguration.cs"
   }
 }

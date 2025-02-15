@@ -1,11 +1,10 @@
-using Application.ViewModels.Common;
+using DotNetApp.ViewModels.Base;
 using System;
 
 namespace Application.ViewModels.NAM.US.CBFT
 {
-    public class USCBFTModel
+    public class USCBFTModel : BaseAppModel
     {
-        public PaymentMethodModel PaymentMethod { get; set; }
         public USPaymentDetailsSection PaymentDetails { get; set; }
         public USBeneficiaryDetailsSection BeneficiaryDetails { get; set; }
     }
