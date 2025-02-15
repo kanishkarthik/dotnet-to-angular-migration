@@ -51,6 +51,25 @@ label {
   &-body {
     padding: 2rem;
   }
+  
+  &.h-100 {
+    height: 100%;
+    
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      
+      label {
+        margin-bottom: 0.5rem;
+      }
+      
+      p {
+        font-size: 1rem;
+        color: var(--text-primary);
+      }
+    }
+  }
 }
 
 .section-title {
@@ -217,4 +236,41 @@ label {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.stepper-wrapper {
+  .stepper-item {
+    z-index: 1;
+  }
+
+  .step-counter {
+    width: 35px;
+    height: 35px;
+    background-color: #e9ecef;
+    color: #6c757d;
+    
+    &.active {
+      background-color: #007bff;
+      color: white;
+    }
+    
+    &.completed {
+      background-color: #28a745;
+      color: white;
+    }
+  }
+
+  .progress {
+    z-index: 0;
+    .progress-bar {
+      background-color: #28a745;
+      transition: width 0.3s ease;
+    }
+  }
+}
+
+.step-name {
+  color: #6c757d;
+  font-weight: 500;
+  max-width: 120px;
 }

@@ -1,0 +1,14 @@
+.step-counter.disabled {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed !important;
+}
+
+.step-counter.disabled:hover {
+    background-color: #e9ecef;
+}
+
+.text-muted {
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+}

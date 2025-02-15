@@ -26,6 +26,8 @@ export class DynamicFormComponent implements OnInit {
   activeLookupField: any;
   lookupHeaders: string[] = [];
   lookupData: any[] = [];
+  currentStep: number = 0;
+  steps: any[] = [];
   constructor(private http: HttpClient, private fb: FormBuilder) {
   }
 
@@ -54,6 +56,11 @@ export class DynamicFormComponent implements OnInit {
       }
       this.formConfig = config;
       this.initializeForms();
+      this.steps = this.formConfig.sections.map((section: any, index: number) => ({
+        ...section,
+        completed: false,
+        active: index === 0
+      }));
       //this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
       this.formConfig.sections.forEach((section: any) => {
         if (section.section.toLowerCase().indexOf('PaymentMethod'.toLowerCase()) !== -1) {
@@ -67,9 +74,11 @@ export class DynamicFormComponent implements OnInit {
             } else if (field.field === section.section+'_AccountName') {
               field.value = redirectDataObj.accountName;
             }
+            this.forms[section.section].patchValue({ [field.field]: field.value });
           });
         }
       });
+      this.addReviewStep();
       // sessionStorage.removeItem('redirectData');
       this.setFormData({});
       this.initilizeDropdownOptions({});
@@ -120,18 +129,61 @@ export class DynamicFormComponent implements OnInit {
     return formValid;
   }
 
+  nextStep(): void {
+    if (this.currentStep < this.steps.length - 1) {
+      const currentSection = this.steps[this.currentStep].section;
+      if (this.forms[currentSection].valid) {
+        this.steps[this.currentStep].completed = true;
+        this.steps[this.currentStep].active = false;
+        this.currentStep++;
+        this.steps[this.currentStep].active = true;
+      } else {
+        Object.keys(this.forms[currentSection].controls).forEach(key => {
+          const control = this.forms[currentSection].get(key);
+          if (control) {
+            control.markAsTouched();
+          }
+        });
+      }
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 0) {
+      this.steps[this.currentStep].active = false;
+      this.currentStep--;
+      this.steps[this.currentStep].active = true;
+    }
+  }
+
+  canProceed(): boolean {
+    if (this.currentStep >= this.steps.length) return false;
+    const currentSection = this.steps[this.currentStep].section;
+    return this.forms[currentSection].valid;
+  }
+
+  isLastStep(): boolean {
+    return this.currentStep === this.steps.length - 1;
+  }
+
+  isFirstStep(): boolean {
+    return this.currentStep === 0;
+  }
+
   onSubmit(): void {
-    const modal = this.getModal('confirmationModal');
-    this.modalOptions = {
-      title: 'Confirmation',
-      description: 'The Payment has been successfully submitted',
-      ok: () => {
-        modal.hide();
-        window.location.href = '/';
-      },
-      isCancel: false
-    };
-    modal.show();
+    if (this.isFormValid()) {
+      const modal = this.getModal('confirmationModal');
+      this.modalOptions = {
+        title: 'Confirmation',
+        description: 'The Payment has been successfully submitted',
+        ok: () => {
+          modal.hide();
+          window.location.href = '/';
+        },
+        isCancel: false
+      };
+      modal.show();
+    }
   }
 
   onCancel(): void {
@@ -205,5 +257,38 @@ export class DynamicFormComponent implements OnInit {
     }
     const modal = bootstrap.Modal.getInstance(document.getElementById('lookupModal'));
     modal.hide();
+  }
+
+  getFormattedData(): any[] {
+    const formattedData: any[] = [];
+    this.formConfig.sections.forEach((section: any) => {
+      const sectionData = {
+        title: section.title,
+        fields: section.fields.map((field: any) => ({
+          label: field.label,
+          value: this.forms[section.section].get(field.field)?.value || ''
+        }))
+      };
+      formattedData.push(sectionData);
+    });
+    return formattedData;
+  }
+
+  addReviewStep(): void {
+    // Add review step after initialization of other steps
+    this.steps.push({
+      section: 'review',
+      title: 'Review',
+      completed: false,
+      active: false
+    });
+  }
+
+  goToStep(stepIndex: number): void {
+    if (stepIndex < this.currentStep || this.steps[stepIndex - 1]?.completed) {
+      this.steps[this.currentStep].active = false;
+      this.currentStep = stepIndex;
+      this.steps[this.currentStep].active = true;
+    }
   }
 }

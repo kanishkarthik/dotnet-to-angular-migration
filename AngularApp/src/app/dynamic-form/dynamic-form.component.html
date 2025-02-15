@@ -7,107 +7,177 @@
           Payment Form
         </h2>
       </div>
+
+      <!-- Add Stepper Navigation -->
+      <div class="px-4 pt-4">
+        <div class="stepper-wrapper d-flex justify-content-between position-relative mb-4">
+          <div class="progress position-absolute" style="width: 100%; height: 2px; top: 50%;">
+            <div class="progress-bar" role="progressbar" [style.width.%]="(currentStep / (steps.length-1)) * 100"></div>
+          </div>
+          <div *ngFor="let step of steps; let i = index" 
+               class="stepper-item d-flex flex-column align-items-center position-relative">
+            <div class="step-counter rounded-circle d-flex align-items-center justify-content-center"
+                 [class.active]="step.active"
+                 [class.completed]="step.completed"
+                 [class.disabled]="i > currentStep && !steps[i-1]?.completed"
+                 [class.clickable]="i < currentStep || steps[i-1]?.completed"
+                 (click)="i < currentStep || steps[i-1]?.completed ? goToStep(i) : null"
+                 [style.cursor]="i < currentStep || steps[i-1]?.completed ? 'pointer' : 'not-allowed'">
+              <i *ngIf="step.completed" class="fas fa-check"></i>
+              <i *ngIf="!step.completed && i > currentStep && !steps[i-1]?.completed" class="fas fa-lock"></i>
+              <span *ngIf="!step.completed && !(i > currentStep && !steps[i-1]?.completed)">{{i + 1}}</span>
+            </div>
+            <div class="step-name mt-2 text-center small"
+                 [class.text-muted]="i > currentStep && !steps[i-1]?.completed"
+                 [class.clickable]="i < currentStep || steps[i-1]?.completed"
+                 (click)="i < currentStep || steps[i-1]?.completed ? goToStep(i) : null"
+                 [style.cursor]="i < currentStep || steps[i-1]?.completed ? 'pointer' : 'not-allowed'">{{step.title}}</div>
+          </div>
+        </div>
+      </div>
       
-      <div class="card-body p-4 p-md-5">
-        <div *ngFor="let section of formConfig?.sections" class="mb-5">
-          <h3 class="section-title border-bottom pb-2 mb-4 fw-normal text-primary">{{ section.title }}</h3>
-          
-          <form [formGroup]="forms[section.section]" class="row g-4">
-            <div *ngFor="let field of section.fields" class="col-md-4">
-              <div class="mb-3">
-                <!-- Label -->
-                <label for="{{ field.field }}" class="form-label text-muted small text-uppercase">
-                  {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
-                </label>
-
-                <!-- Textbox -->
-                <input *ngIf="field.type === 'textbox'" 
-                  [formControlName]="field.field"
-                  [id]="field.field"
-                  [required]="field.required"
-                  [pattern]="field.pattern || null"
-                  type="text"
-                  class="form-control shadow-sm" />
-
-                <!-- Label Display -->
-                <div *ngIf="field.type === 'label'" class="p-2 bg-light rounded">
-                  <p class="form-control-plaintext fw-semibold mb-0">{{ field.value }}</p>
-                </div>
-
-                <!-- Lookup -->
-                <div *ngIf="field.type === 'lookup'" class="input-group shadow-sm">
-                  <input [formControlName]="field.field"
-                    [id]="field.field"
-                    [required]="field.required"
-                    type="text"
-                    class="form-control"
-                    (click)="openLookupModal(field, section)" readonly />
-                  <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-
-                <!-- Date -->
-                <input *ngIf="field.type === 'date'"
-                  [formControlName]="field.field"
-                  [id]="field.field"
-                  type="date"
-                  class="form-control shadow-sm" />
-
-                <!-- Checkbox -->
-                <div class="form-check" *ngIf="field.type === 'checkbox'">
-                  <input [formControlName]="field.field"
-                    [id]="field.field"
-                    type="checkbox"
-                    class="form-check-input shadow-sm" />
-                </div>
-
-                <!-- Dropdown -->
-                <select *ngIf="field.type === 'dropdown'"
-                  [formControlName]="field.field"
-                  [id]="field.field"
-                  class="form-select shadow-sm">
-                  <option value="" disabled selected>-- Select --</option>
-                  <option *ngFor="let option of field.options" [value]="option.value">
-                    {{ option.label }}
-                  </option>
-                </select>
-
-                <!-- Textarea -->
-                <textarea *ngIf="field.type === 'textarea'"
-                  [formControlName]="field.field"
-                  [id]="field.field"
-                  class="form-control shadow-sm"></textarea>
-
-                <!-- Error Message -->
-                <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
-                  class="text-danger small mt-2">
-                  <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
-                    {{ field.label }} is required.
-                  </small>
-                    <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
-                    Invalid format for {{ field.label }}.
-                    </small>
-                    <small *ngIf="forms[section.section].get(field.field)?.errors?.['minlength']">
-                    {{ field.label }} must be at least {{ field.minLength }} characters long.
-                    </small>
-                    <small *ngIf="forms[section.section].get(field.field)?.errors?.['maxlength']">
-                    {{ field.label }} cannot be more than {{ field.maxLength }} characters long.
-                    </small>
+      <div class="card-body p-4">
+        <!-- Show only current section -->
+        <div *ngFor="let section of steps; let i = index">
+          <div [hidden]="currentStep !== i">
+            <!-- Show review section if it's the last step -->
+            <div *ngIf="section.section === 'review'; else regularSection">
+              <h3 class="section-title border-bottom pb-2 mb-4 fw-normal text-primary">Review Your Information</h3>
+              <div class="row">
+                <div class="col-12">
+                  <div *ngFor="let sectionData of getFormattedData()" class="mb-4">
+                    <h4 class="text-primary mb-3">{{ sectionData.title }}</h4>
+                    <div class="row g-3">
+                      <div *ngFor="let field of sectionData.fields" class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                          <div class="card-body">
+                            <label class="text-muted small text-uppercase">{{ field.label }}</label>
+                            <p class="mb-0 fw-bold">{{ field.value || 'N/A' }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </form>
+            
+            <ng-template #regularSection>
+              <h3 class="section-title border-bottom pb-2 mb-4 fw-normal text-primary">{{ section.title }}</h3>
+              <form [formGroup]="forms[section.section]" class="row g-4">
+                <div *ngFor="let field of section.fields" class="col-md-4">
+                  <div class="mb-3">
+                    <!-- Label -->
+                    <label for="{{ field.field }}" class="form-label text-muted small text-uppercase">
+                      {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
+                    </label>
+
+                    <!-- Textbox -->
+                    <input *ngIf="field.type === 'textbox'" 
+                      [formControlName]="field.field"
+                      [id]="field.field"
+                      [required]="field.required"
+                      [pattern]="field.pattern || null"
+                      type="text"
+                      class="form-control shadow-sm" />
+
+                    <!-- Label Display -->
+                    <div *ngIf="field.type === 'label'" class="p-2 bg-light rounded">
+                      <p class="form-control-plaintext fw-semibold mb-0">{{ field.value }}</p>
+                    </div>
+
+                    <!-- Lookup -->
+                    <div *ngIf="field.type === 'lookup'" class="input-group shadow-sm">
+                      <input [formControlName]="field.field"
+                        [id]="field.field"
+                        [required]="field.required"
+                        type="text"
+                        class="form-control"
+                        (click)="openLookupModal(field, section)" readonly />
+                      <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
+                        <i class="fas fa-search"></i>
+                      </button>
+                    </div>
+
+                    <!-- Date -->
+                    <input *ngIf="field.type === 'date'"
+                      [formControlName]="field.field"
+                      [id]="field.field"
+                      type="date"
+                      class="form-control shadow-sm" />
+
+                    <!-- Checkbox -->
+                    <div class="form-check" *ngIf="field.type === 'checkbox'">
+                      <input [formControlName]="field.field"
+                        [id]="field.field"
+                        type="checkbox"
+                        class="form-check-input shadow-sm" />
+                    </div>
+
+                    <!-- Dropdown -->
+                    <select *ngIf="field.type === 'dropdown'"
+                      [formControlName]="field.field"
+                      [id]="field.field"
+                      class="form-select shadow-sm">
+                      <option value="" disabled selected>-- Select --</option>
+                      <option *ngFor="let option of field.options" [value]="option.value">
+                        {{ option.label }}
+                      </option>
+                    </select>
+
+                    <!-- Textarea -->
+                    <textarea *ngIf="field.type === 'textarea'"
+                      [formControlName]="field.field"
+                      [id]="field.field"
+                      class="form-control shadow-sm"></textarea>
+
+                    <!-- Error Message -->
+                    <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
+                      class="text-danger small mt-2">
+                      <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
+                        {{ field.label }} is required.
+                      </small>
+                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
+                        Invalid format for {{ field.label }}.
+                        </small>
+                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['minlength']">
+                        {{ field.label }} must be at least {{ field.minLength }} characters long.
+                        </small>
+                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['maxlength']">
+                        {{ field.label }} cannot be more than {{ field.maxLength }} characters long.
+                        </small>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </ng-template>
+          </div>
         </div>
       </div>
 
-      <div class="card-footer d-flex justify-content-end gap-3 p-4 bg-light">
-        <button class="btn btn-outline-secondary px-4" (click)="onCancel()">
-          <i class="fas fa-times me-2"></i>Cancel
+      <div class="card-footer d-flex justify-content-between p-4 bg-light">
+        <button class="btn btn-outline-secondary px-4" 
+                *ngIf="!isFirstStep()"
+                (click)="previousStep()">
+          <i class="fas fa-arrow-left me-2"></i>Previous
         </button>
-        <button class="btn btn-primary px-4" (click)="onSubmit()" [disabled]="!isFormValid()">
-          <i class="fas fa-check me-2"></i>Submit
-        </button>
+        <div class="ms-auto">
+          <button class="btn btn-outline-secondary px-4 me-2" (click)="onCancel()">
+            <i class="fas fa-times me-2"></i>Cancel
+          </button>
+          <button *ngIf="!isLastStep()" 
+                  class="btn btn-primary px-4" 
+                  (click)="nextStep()"
+                  [disabled]="!canProceed()">
+            <i class="fas fa-arrow-right me-2"></i>Next
+          </button>
+          <button *ngIf="isLastStep()" 
+                  class="btn btn-success px-4" 
+                  (click)="onSubmit()"
+                  [disabled]="!isFormValid()">
+            <i class="fas fa-check me-2"></i>Submit
+          </button>
+        </div>
       </div>
     </div>
   </div>
