@@ -24,6 +24,11 @@ ASPNETMVC_CONFIG_FILE = os.path.join(ROOT_PATH, "DotNetApp", "configurations.jso
 ASPNETMVC_APP_CONFIG_PATH = os.path.join(ROOT_PATH, "DotNetApp", "ViewConfigurations")
 ASPNETMVC_APP_PATH = os.path.join(ROOT_PATH, "DotNetApp")
 SAMPLE_METADATA_PATH = os.path.join(ROOT_PATH,'MetaDataParser', 'config', 'sample_metadata.json')
+# Log Directory Path
+LOG_DIR_PATH = os.path.join(ROOT_PATH, 'logs')
 
 # Index Storage Path
 INDEX_STORAGE_PATH = os.path.join(ROOT_PATH, 'storage', 'vector_index')
+
+# Chroma Db Path
+CHROMA_DB_PATH = os.path.join(ROOT_PATH, 'chroma_db')

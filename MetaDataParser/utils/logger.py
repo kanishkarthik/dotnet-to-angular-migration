@@ -2,13 +2,15 @@ import logging
 import os
 from datetime import datetime
 
+from config.constants import LOG_DIR_PATH
+
 class Logger:
     def __init__(self):
         self.logger = logging.getLogger('metadata_parser')
         self.logger.setLevel(logging.INFO)
         
         # Create logs directory if it doesn't exist
-        log_dir = 'logs'
+        log_dir = LOG_DIR_PATH
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         

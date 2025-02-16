@@ -58,7 +58,7 @@ class MetadataGenerator:
         if ai_model == 'groq':
             return GroqService(llm_model).analyze(content, custom_prompt)
         elif ai_model == 'groq_ingest':
-            return GroqIngestService(llm_model, True).analyze(country_code, payment_method, custom_prompt)
+            return GroqIngestService(llm_model, False).analyze(country_code, payment_method, custom_prompt)
         elif ai_model == 'gemini':
             return GeminiService(llm_model).analyze(content, custom_prompt)
         else:

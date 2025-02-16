@@ -16,8 +16,13 @@ class OllamaService:
 
     def needs_processing(self) -> bool:
         logger.info("Checking if C# files need processing")
-        existing_files = set(self.collection.get()["ids"])
+        
+        # Retrieve existing file metadata
+        stored_data = self.collection.get()
+        existing_files = set(stored_data["ids"]) if "ids" in stored_data else set()
+        
         current_files = set()
+        modified_files = set()
         
         for root, _, files in os.walk(ASPNETMVC_APP_PATH):
             for file in files:
@@ -25,24 +30,26 @@ class OllamaService:
                     file_path = os.path.join(root, file)
                     current_files.add(file_path)
                     
-                    # If file exists in DB, check if it was modified
                     if file_path in existing_files:
+                        # Get stored modification time
                         db_metadata = self.collection.get(ids=[file_path])["metadatas"][0]
                         stored_mtime = db_metadata.get("last_modified", 0)
                         current_mtime = os.path.getmtime(file_path)
                         
                         if current_mtime > stored_mtime:
-                            logger.info("Found changes in C# files, processing needed")
-                            return True
-        
-        # Check if there are new files or deleted files
-        if len(current_files) != len(existing_files):
-            logger.info("Found changes in C# files, processing needed")
+                            modified_files.add(file_path)
+
+        # If any file is modified, new, or deleted, we need processing
+        if modified_files or (current_files - existing_files) or (existing_files - current_files):
+            logger.info(f"Changes detected. New files: {len(current_files - existing_files)}, "
+                        f"Modified: {len(modified_files)}, Deleted: {len(existing_files - current_files)}")
             return True
-        logger.info("No changes detected in C# files")
+
+        logger.info("No changes detected in C# files. Skipping processing.")
         return False
 
-    def generate_response(self, prompt: str, context: str = "") -> str:
+
+    def generate_response(self, prompt: str, context: str = '') -> str:
         logger.info("Generating response for prompt")
 
         # Process C# files if needed
@@ -59,23 +66,21 @@ class OllamaService:
             # Query ChromaDB for similar documents
             results = self.collection.query(
                 query_embeddings=[query_embedding],
-                n_results=5  # Increase results for better context
+                n_results=10  # Retrieve more documents for better accuracy
             )
 
-            # Extract top matches
-            if results["documents"]:
-                relevant_docs = [doc for doc in results["documents"][0] if doc]  # Ensure non-empty docs
-                context = "\n\n".join(relevant_docs) if relevant_docs else context
-                logger.info(f"Retrieved {len(relevant_docs)} relevant documents from ChromaDB")
-            else:
-                logger.warning("No relevant documents found in ChromaDB")
-            
-            # Ensure there's enough context
-            if not context:
-                logger.warning("No context available! Ollama might return a generic response.")
+            # Extract relevant documents
+            relevant_docs = results["documents"][0] if results["documents"] else []
+            logger.info(f"Retrieved {len(relevant_docs)} relevant documents from ChromaDB")
 
-            # Formulate prompt with retrieved context
-            final_prompt = f"Context:\n{context}\n\nUser Query: {prompt}" if context else prompt
+            if not relevant_docs:
+                logger.warning("No relevant documents found! The response might lack accuracy.")
+
+            # Construct an informative context
+            structured_context = self.build_context(relevant_docs)
+
+            # Formulate the final prompt
+            final_prompt = f"Context:\n{structured_context}\n\nUser Query: {prompt}" if structured_context else prompt
 
             # Generate response from Ollama
             response = ollama.generate(model=self.model_name, prompt=final_prompt)
@@ -85,30 +90,40 @@ class OllamaService:
             logger.error(f"Error generating response: {str(e)}")
             raise
 
-
     def process_csharp_files(self) -> None:
         logger.info("Starting C# files processing")
 
-        # Fetch existing document IDs
-        existing_ids = self.collection.get()["ids"]
-
-        # Delete existing records only if they exist
-        if existing_ids:
-            self.collection.delete(ids=existing_ids)
-            logger.info(f"Deleted {len(existing_ids)} existing records from ChromaDB")
+        # Get existing file metadata
+        stored_data = self.collection.get()
+        existing_files = set(stored_data["ids"]) if "ids" in stored_data else set()
 
         processed_count = 0
+        scan_files = ["Controllers", "ViewConfigurations", "ViewModels", "Views"]
         for root, _, files in os.walk(ASPNETMVC_APP_PATH):
+            if not any(scan_dir in root for scan_dir in scan_files):
+                continue  # Skip directories that are not in scan_files
+
             for file in files:
-                if file.endswith(".cs"):
+                if file.endswith(".cs") and "Core" not in file:
                     file_path = os.path.join(root, file)
+                    
+                    # Check if the file is new or modified
+                    needs_update = file_path not in existing_files or os.path.getmtime(file_path) > \
+                                self.collection.get(ids=[file_path])["metadatas"][0].get("last_modified", 0)
+
+                    if not needs_update:
+                        continue  # Skip processing if the file is already up to date
+
                     logger.info(f"Processing file: {file_path}")
                     try:
                         with open(file_path, 'r', encoding='utf-8') as f:
                             content = f.read()
 
+                            # Extract meaningful sections from the code
+                            extracted_content = self.extract_relevant_content(content)
+
                             # Generate embeddings
-                            embedding_response = ollama.embeddings(model=self.model_name, prompt=content)
+                            embedding_response = ollama.embeddings(model=self.model_name, prompt=extracted_content)
                             if not embedding_response or "embedding" not in embedding_response:
                                 logger.error(f"Embedding generation failed for {file_path}")
                                 continue
@@ -118,7 +133,7 @@ class OllamaService:
                             # Store in ChromaDB with last modified time
                             self.collection.add(
                                 embeddings=[embedding],
-                                documents=[content],
+                                documents=[extracted_content],
                                 metadatas=[{
                                     "file_path": file_path,
                                     "last_modified": os.path.getmtime(file_path)
@@ -132,6 +147,28 @@ class OllamaService:
         logger.info(f"Completed processing {processed_count} C# files")
 
 
+    def extract_relevant_content(self, content: str) -> str:
+        """
+        Extract relevant sections (e.g., class names, methods, comments, attributes) 
+        from C# code to improve embeddings.
+        """
+        extracted_lines = []
+        for line in content.split("\n"):
+            line = line.strip()
+            if line.startswith("class ") or line.startswith("public") or line.startswith("private") or line.startswith("//"):
+                extracted_lines.append(line)
+        
+        return "\n".join(extracted_lines)
+
+    def build_context(self, documents: list) -> str:
+        """
+        Construct a structured context for better prompt engineering.
+        """
+        context_sections = []
+        for doc in documents:
+            context_sections.append(f"Relevant Code Snippet:\n{doc}")
+
+        return "\n\n".join(context_sections)
 
     def close(self):
         logger.info("Closing ChromaDB connection")

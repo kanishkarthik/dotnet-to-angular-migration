@@ -7,5 +7,5 @@ flask
 llama_index
 llama-index-llms-groq
 llama-index-embeddings-huggingface
-dotenv
-requests==2.28.2sentence-transformers==2.2.2faiss-cpu==1.7.4langchain==0.0.200flask
+llama-index-llms-ollama
+llama-index-vector-stores-chroma
