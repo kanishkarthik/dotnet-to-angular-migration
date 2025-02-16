@@ -28,6 +28,8 @@ export class DynamicFormComponent implements OnInit {
   lookupData: any[] = [];
   currentStep: number = 0;
   steps: any[] = [];
+  isStepperView: boolean = true;
+
   constructor(private http: HttpClient, private fb: FormBuilder) {
   }
 
@@ -290,5 +292,9 @@ export class DynamicFormComponent implements OnInit {
       this.currentStep = stepIndex;
       this.steps[this.currentStep].active = true;
     }
+  }
+
+  toggleView(): void {
+    this.isStepperView = !this.isStepperView;
   }
 }
