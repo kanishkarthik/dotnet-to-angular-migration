@@ -42,8 +42,10 @@ class OllamaService:
         logger.info("No changes detected in C# files")
         return False
 
-    def generate_response(self, prompt: str, context: str) -> str:
+    def generate_response(self, prompt: str, context: str = "") -> str:
         logger.info("Generating response for prompt")
+
+        # Process C# files if needed
         if self.needs_processing():
             logger.info("Processing C# files before generating response")
             self.process_csharp_files()
@@ -51,20 +53,28 @@ class OllamaService:
         try:
             # Generate query embedding
             embedding_response = ollama.embeddings(model=self.model_name, prompt=prompt)
-            query_embedding = embedding_response["embedding"]  # Extract list of floats
+            query_embedding = embedding_response["embedding"]
 
             logger.info("Querying ChromaDB for relevant context")
             # Query ChromaDB for similar documents
             results = self.collection.query(
-                query_embeddings=[query_embedding],  # Ensure embeddings are passed correctly
-                n_results=3
+                query_embeddings=[query_embedding],
+                n_results=5  # Increase results for better context
             )
 
             # Extract top matches
-            relevant_docs = [doc for doc in results["documents"][0]] if results["documents"] else []
-            context = "\n\n".join(relevant_docs)
+            if results["documents"]:
+                relevant_docs = [doc for doc in results["documents"][0] if doc]  # Ensure non-empty docs
+                context = "\n\n".join(relevant_docs) if relevant_docs else context
+                logger.info(f"Retrieved {len(relevant_docs)} relevant documents from ChromaDB")
+            else:
+                logger.warning("No relevant documents found in ChromaDB")
+            
+            # Ensure there's enough context
+            if not context:
+                logger.warning("No context available! Ollama might return a generic response.")
 
-            # Formulate prompt with context
+            # Formulate prompt with retrieved context
             final_prompt = f"Context:\n{context}\n\nUser Query: {prompt}" if context else prompt
 
             # Generate response from Ollama
@@ -74,6 +84,7 @@ class OllamaService:
         except Exception as e:
             logger.error(f"Error generating response: {str(e)}")
             raise
+
 
     def process_csharp_files(self) -> None:
         logger.info("Starting C# files processing")
@@ -98,6 +109,10 @@ class OllamaService:
 
                             # Generate embeddings
                             embedding_response = ollama.embeddings(model=self.model_name, prompt=content)
+                            if not embedding_response or "embedding" not in embedding_response:
+                                logger.error(f"Embedding generation failed for {file_path}")
+                                continue
+
                             embedding = embedding_response["embedding"]
 
                             # Store in ChromaDB with last modified time
@@ -115,6 +130,7 @@ class OllamaService:
                         logger.error(f"Error processing file {file_path}: {str(e)}")
 
         logger.info(f"Completed processing {processed_count} C# files")
+
 
 
     def close(self):

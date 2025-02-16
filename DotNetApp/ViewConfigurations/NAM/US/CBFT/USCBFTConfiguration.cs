@@ -22,7 +22,7 @@ namespace DotNetApp.ViewConfigurations.NAM.US.CBFT
                 .Type("textbox")
                 .Required(true)
                 .Pattern("[A-Z0-9]+")
-                .MaxLength(16);
+                .MaxLength(15);
 
             ConfigureModel(model => model.PaymentDetails.ValueDate)
                 .Name("Value Date")

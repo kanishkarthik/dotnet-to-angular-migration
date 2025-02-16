@@ -18,14 +18,6 @@ load_dotenv()
 api_key = GROQ_API_KEY 
 
 
-def get_sample_metadata() -> str:
-    wmetadata_structure = ''
-        # read json as string config/metadata_sample.json
-    with open(SAMPLE_METADATA_PATH, 'r') as file:
-        # read json as string config/metadata_sample
-        metadata_structure = file.read()
-    return metadata_structure
-
 class GroqIngestService(BaseLLMService):
     def __init__(self, llm_model: str, clear_index: bool = False):
         logger.info("Initializing GroqIngestService")
@@ -85,7 +77,7 @@ class GroqIngestService(BaseLLMService):
     def analyze(self, country_code: str, payment_method: str, custom_prompt: str = None) -> str:
         logger.info(f"Starting Groq Ingest analysis for country: {country_code}, payment method: {payment_method}")
         try:
-            metadata_structure = get_sample_metadata()
+            metadata_structure = self.metadata_structure
             base_query = (
                 f"Analyze the provided ASP.NET MVC codebase and generate JSON metadata only if "
                 f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
