@@ -1,174 +1,163 @@
-import ollama
 import os
+import ollama
 import chromadb
+from llama_index.core import (
+    VectorStoreIndex,
+    StorageContext,
+    Settings
+)
+from llama_index.core.schema import Document
+from llama_index.llms.ollama import Ollama
+from llama_index.vector_stores.chroma import ChromaVectorStore
+from config.constants import ASPNETMVC_APP_PATH, CHROMA_DB_PATH
 from utils.logger import logger
-from chromadb.config import Settings
-from config.constants import ASPNETMVC_APP_PATH
 
-class OllamaService:
+class OllamaRAGService:
     def __init__(self, model_name: str):
         self.model_name = model_name
-        logger.info(f"Initializing OllamaService with model: {model_name}")
-        
-        self.chroma_client = chromadb.PersistentClient(path="./chroma_db")  # Use a persistent store
-        self.collection = self.chroma_client.get_or_create_collection("dotnetapp")
-        logger.info("ChromaDB connection established")
+        logger.info(f"Initializing OllamaRAGService with model: {model_name}")
 
-    def needs_processing(self) -> bool:
-        logger.info("Checking if C# files need processing")
-        
-        # Retrieve existing file metadata
-        stored_data = self.collection.get()
-        existing_files = set(stored_data["ids"]) if "ids" in stored_data else set()
-        
-        current_files = set()
-        modified_files = set()
-        
-        for root, _, files in os.walk(ASPNETMVC_APP_PATH):
-            for file in files:
-                if file.endswith(".cs"):
-                    file_path = os.path.join(root, file)
-                    current_files.add(file_path)
-                    
-                    if file_path in existing_files:
-                        # Get stored modification time
-                        db_metadata = self.collection.get(ids=[file_path])["metadatas"][0]
-                        stored_mtime = db_metadata.get("last_modified", 0)
-                        current_mtime = os.path.getmtime(file_path)
-                        
-                        if current_mtime > stored_mtime:
-                            modified_files.add(file_path)
+        # Initialize ChromaDB for persistent storage
+        self.chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+        self.vector_store = ChromaVectorStore(chroma_collection=self.chroma_client.get_or_create_collection("dotnetapp"))
+        self.storage_context = StorageContext.from_defaults(vector_store=self.vector_store)
 
-        # If any file is modified, new, or deleted, we need processing
-        if modified_files or (current_files - existing_files) or (existing_files - current_files):
-            logger.info(f"Changes detected. New files: {len(current_files - existing_files)}, "
-                        f"Modified: {len(modified_files)}, Deleted: {len(existing_files - current_files)}")
-            return True
+        # Set up LLM (Ollama)
+        self.llm = Ollama(model=model_name)
+        Settings.llm = self.llm
 
-        logger.info("No changes detected in C# files. Skipping processing.")
-        return False
-
-
-    def generate_response(self, prompt: str, context: str = '') -> str:
-        logger.info("Generating response for prompt")
-
-        # Process C# files if needed
-        if self.needs_processing():
-            logger.info("Processing C# files before generating response")
-            self.process_csharp_files()
-
-        try:
-            # Generate query embedding
-            embedding_response = ollama.embeddings(model=self.model_name, prompt=prompt)
-            query_embedding = embedding_response["embedding"]
-
-            logger.info("Querying ChromaDB for relevant context")
-            # Query ChromaDB for similar documents
-            results = self.collection.query(
-                query_embeddings=[query_embedding],
-                n_results=10  # Retrieve more documents for better accuracy
+        # Check if we need to reprocess C# files
+        changed_files = self.needs_processing()
+        if changed_files:
+            logger.info(f"Changes detected in {len(changed_files)} C# files, updating index.")
+            self.index = self.build_index(changed_files)
+        else:
+            logger.info("No changes detected in C# files, loading existing index.")
+            self.index = VectorStoreIndex.from_vector_store(
+                self.vector_store
             )
 
-            # Extract relevant documents
-            relevant_docs = results["documents"][0] if results["documents"] else []
-            logger.info(f"Retrieved {len(relevant_docs)} relevant documents from ChromaDB")
+        # Configure Query Engine with RAG
+        self.query_engine = self.index.as_query_engine()
 
-            if not relevant_docs:
-                logger.warning("No relevant documents found! The response might lack accuracy.")
+    def needs_processing(self) -> list:
+        """
+        Checks if C# files have changed and returns list of files that need reprocessing.
+        """
+        logger.info("Checking if C# files need processing...")
+        changed_files = []
 
-            # Construct an informative context
-            structured_context = self.build_context(relevant_docs)
+        # Get collection info
+        collection = self.chroma_client.get_collection("dotnetapp")
+        if collection.count() == 0:
+            # Get all .cs files if no index exists
+            for root, _, files in os.walk(ASPNETMVC_APP_PATH):
+                for file in files:
+                    if file.endswith(".cs") and "Core" not in file:
+                        changed_files.append(os.path.join(root, file))
+            return changed_files
 
-            # Formulate the final prompt
-            final_prompt = f"Context:\n{structured_context}\n\nUser Query: {prompt}" if structured_context else prompt
+        # Get stored documents and their metadata
+        stored_data = collection.get(include=["metadatas"])
+        stored_metadatas = stored_data.get("metadatas", [])
+        stored_ids = stored_data.get("ids", [])
 
-            # Generate response from Ollama
-            response = ollama.generate(model=self.model_name, prompt=final_prompt)
-            logger.info("Successfully generated response")
-            return response["response"]
-        except Exception as e:
-            logger.error(f"Error generating response: {str(e)}")
-            raise
+        # Create a mapping of file paths to their last modified times
+        stored_file_times = {
+            file_id: metadata.get("last_modified", 0)
+            for file_id, metadata in zip(stored_ids, stored_metadatas)
+        }
 
-    def process_csharp_files(self) -> None:
-        logger.info("Starting C# files processing")
+        scan_dirs = ["Controllers", "ViewConfigurations", "ViewModels", "Views"]
 
-        # Get existing file metadata
-        stored_data = self.collection.get()
-        existing_files = set(stored_data["ids"]) if "ids" in stored_data else set()
-
-        processed_count = 0
-        scan_files = ["Controllers", "ViewConfigurations", "ViewModels", "Views"]
+        # Check current files
         for root, _, files in os.walk(ASPNETMVC_APP_PATH):
-            if not any(scan_dir in root for scan_dir in scan_files):
-                continue  # Skip directories that are not in scan_files
+            if not any(scan_dir in root for scan_dir in scan_dirs):
+                continue
 
             for file in files:
                 if file.endswith(".cs") and "Core" not in file:
                     file_path = os.path.join(root, file)
-                    
-                    # Check if the file is new or modified
-                    needs_update = file_path not in existing_files or os.path.getmtime(file_path) > \
-                                self.collection.get(ids=[file_path])["metadatas"][0].get("last_modified", 0)
+                    current_mtime = os.path.getmtime(file_path)
 
-                    if not needs_update:
-                        continue  # Skip processing if the file is already up to date
+                    # Check if file is new or modified
+                    if file_path in stored_file_times:
+                        if current_mtime > stored_file_times[file_path]:
+                            changed_files.append(file_path)
+                    else:
+                        changed_files.append(file_path)
 
-                    logger.info(f"Processing file: {file_path}")
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
+        # Handle deleted files
+        for stored_id in stored_ids:
+            if not os.path.exists(stored_id):
+                self.vector_store.client.delete(ids=[stored_id])
 
-                            # Extract meaningful sections from the code
-                            extracted_content = self.extract_relevant_content(content)
+        return changed_files
 
-                            # Generate embeddings
-                            embedding_response = ollama.embeddings(model=self.model_name, prompt=extracted_content)
-                            if not embedding_response or "embedding" not in embedding_response:
-                                logger.error(f"Embedding generation failed for {file_path}")
-                                continue
-
-                            embedding = embedding_response["embedding"]
-
-                            # Store in ChromaDB with last modified time
-                            self.collection.add(
-                                embeddings=[embedding],
-                                documents=[extracted_content],
-                                metadatas=[{
-                                    "file_path": file_path,
-                                    "last_modified": os.path.getmtime(file_path)
-                                }],
-                                ids=[file_path]
-                            )
-                            processed_count += 1
-                    except Exception as e:
-                        logger.error(f"Error processing file {file_path}: {str(e)}")
-
-        logger.info(f"Completed processing {processed_count} C# files")
-
-
-    def extract_relevant_content(self, content: str) -> str:
+    def build_index(self, changed_files: list):
         """
-        Extract relevant sections (e.g., class names, methods, comments, attributes) 
-        from C# code to improve embeddings.
+        Reads and indexes only the changed C# files, updating ChromaDB.
         """
-        extracted_lines = []
-        for line in content.split("\n"):
-            line = line.strip()
-            if line.startswith("class ") or line.startswith("public") or line.startswith("private") or line.startswith("//"):
-                extracted_lines.append(line)
-        
-        return "\n".join(extracted_lines)
+        logger.info(f"Building index for {len(changed_files)} C# files...")
+        documents = []
+        processed_count = 0
 
-    def build_context(self, documents: list) -> str:
-        """
-        Construct a structured context for better prompt engineering.
-        """
-        context_sections = []
-        for doc in documents:
-            context_sections.append(f"Relevant Code Snippet:\n{doc}")
+        for file_path in changed_files:
+            logger.info(f"Processing C# file: {file_path}")
 
-        return "\n\n".join(context_sections)
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = self.extract_relevant_content(f.read())
+
+                doc = Document(text=content, metadata={"file_path": file_path})
+                documents.append(doc)
+
+                # Delete old entry if exists
+                self.vector_store.client.delete(ids=[file_path])
+
+                # Store in ChromaDB
+                self.vector_store.client.add(
+                    documents=[content],
+                    embeddings=[ollama.embeddings(model=self.model_name, prompt=content)["embedding"]],
+                    metadatas=[{"last_modified": os.path.getmtime(file_path)}],
+                    ids=[file_path]
+                )
+                processed_count += 1
+                logger.info(f"Successfully indexed: {file_path}")
+
+            except Exception as e:
+                logger.error(f"Error processing {file_path}: {str(e)}")
+
+        logger.info(f"Completed processing {processed_count} C# files.")
+
+        # Create LlamaIndex for fast retrieval
+        return VectorStoreIndex.from_vector_store(self.vector_store)
+
+    def generate_response(self, query: str) -> str:
+        """
+        Uses RAG to retrieve relevant C# code snippets and generate a response.
+        """
+        logger.info(f"Generating response for: {query}")
+
+        # Retrieve relevant C# code snippets
+        retrieved_docs = self.query_engine.query(query).response
+
+        # Ensure retrieved docs are properly formatted
+        if isinstance(retrieved_docs, str):
+            logger.warning("Retrieved response is a string instead of a document. Adjusting format.")
+            retrieved_docs = f"Extracted Content:\n{retrieved_docs}"
+
+        final_prompt = f"Context:\n{retrieved_docs}\n\nUser Query: {query}"
+        response = ollama.generate(model=self.model_name, prompt=final_prompt)
+
+        return response["response"]
+
+    @staticmethod
+    def extract_relevant_content(content: str) -> str:
+        """
+        Extracts meaningful sections of C# code to improve embeddings.
+        """
+        return "\n".join(line.strip() for line in content.split("\n") if line.strip().startswith(("class", "public", "private", "//")))
 
     def close(self):
         logger.info("Closing ChromaDB connection")
