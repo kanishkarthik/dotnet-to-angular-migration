@@ -82,7 +82,7 @@ class GroqIngestService(BaseLLMService):
             logger.error(f"Error in index loading/creation: {str(e)}")
             raise
 
-    def analyze(self, country_code: str, payment_method: str) -> str:
+    def analyze(self, country_code: str, payment_method: str, custom_prompt: str = None) -> str:
         logger.info(f"Starting Groq Ingest analysis for country: {country_code}, payment method: {payment_method}")
         try:
             metadata_structure = get_sample_metadata()
@@ -91,6 +91,9 @@ class GroqIngestService(BaseLLMService):
                 f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
             )
             
+            if custom_prompt:
+                base_prompt = "{}{}.".format(base_prompt, custom_prompt)
+
             query = (
                 f"{base_query} Use the following sample structure as reference: {metadata_structure} "
                 f"but return empty json(example: {{}}) when no configuration found for {country_code} country "

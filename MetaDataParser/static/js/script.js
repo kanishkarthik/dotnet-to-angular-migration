@@ -55,6 +55,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     const paymentMethod = document.getElementById("payment_method").value;
     const ai_model = document.getElementById("ai_model").value;    
     const llm_model = document.getElementById("llm_model").value;
+    const customPrompt = document.getElementById("custom_prompt").value;
     const output = document.getElementById("output");
     const previewBtn = document.getElementById("previewBtn");
     const copyBtn = document.getElementById("copyBtn");
@@ -67,7 +68,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
         const response = await fetch("/generate-metadata", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `country_code=${encodeURIComponent(countryCode)}&payment_method=${encodeURIComponent(paymentMethod)}&ai_model=${encodeURIComponent(ai_model)}&llm_model=${encodeURIComponent(llm_model)}`
+            body: `country_code=${encodeURIComponent(countryCode)}&payment_method=${encodeURIComponent(paymentMethod)}&ai_model=${encodeURIComponent(ai_model)}&llm_model=${encodeURIComponent(llm_model)}&custom_prompt=${encodeURIComponent(customPrompt)}`
         });
 
         if (response.ok) {

@@ -11,11 +11,14 @@ class GeminiService(BaseLLMService):
         genai.configure(api_key=GEMINI_API_KEY)
         self.model = genai.GenerativeModel(llm_model)
 
-    def analyze(self, content: str) -> str:
+    def analyze(self, content: str, custom_prompt: str = None) -> str:
         logger.info("Starting Gemini analysis")
         try:
             base_prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
             that can be used to dynamically render fields in an Angular UI."""
+
+            if custom_prompt:
+                base_prompt = "{}{}.".format(base_prompt, custom_prompt)
 
             prompt = f"""{base_prompt}
 

@@ -11,17 +11,20 @@ class GroqService(BaseLLMService):
         self.client = Groq(api_key=GROQ_API_KEY)
         self.llm_model = llm_model
 
-    def analyze(self, content: str) -> str:
+    def analyze(self, content: str, custom_prompt: str = None) -> str:
         logger.info("Starting Groq analysis")
         try:
-            prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
+            base_prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
             that can be used to dynamically render fields in an Angular UI. 
 
             The metadata format should match this structure, and you may need to consider additional UI parameters 
             that are not explicitly mentioned and provide attributes only when it is necessary:
             """
             
-            full_prompt = prompt + self.metadata_structure + f"\nAsp.NET MVC configuration:\n{content}"
+            if custom_prompt:
+                base_prompt = "{}{}.".format(base_prompt, custom_prompt)
+
+            full_prompt = base_prompt + self.metadata_structure + f"\nAsp.NET MVC configuration:\n{content}"
 
             logger.info(f"Sending request to Groq API with content length: {len(content)}")
             response = self.client.chat.completions.create(

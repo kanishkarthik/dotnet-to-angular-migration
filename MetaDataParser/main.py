@@ -25,16 +25,17 @@ def generate_metadata():
     payment_method = request.form.get("payment_method")
     ai_model = request.form.get("ai_model")
     llm_model = request.form.get("llm_model")
+    custom_prompt = request.form.get("custom_prompt")
 
-    logger.info(f"Request parameters - Country: {country_code}, Payment Method: {payment_method}, AI Model: {ai_model}")
+    logger.info(f"Request parameters - Country: {country_code}, Payment Method: {payment_method}, AI Model: {ai_model}, Custom Prompt: {custom_prompt}")
 
     if not all([country_code, payment_method, ai_model]):
         logger.error("Missing required parameters")
         raise ValueError("Country code, payment method, and AI model are required!")
 
     try:
-        metadata = metadata_generator.generate(country_code, payment_method, ai_model, llm_model)
-        logger.info("Successfully generated metadata,"+metadata)
+        metadata = metadata_generator.generate(country_code, payment_method, ai_model, llm_model, custom_prompt)
+        logger.info("Successfully generated metadata")
         return jsonify({"metadata": metadata})
     except Exception as e:
         logger.error(f"Error in generate_metadata endpoint: {str(e)}")
