@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0"><i class="fas fa-robot me-2"></i>Ollama Configuration</h4>
@@ -16,25 +16,26 @@
                             <label for="model_name" class="form-label">Model Name</label>
                             <select class="form-control" id="model_name" name="model_name" required>
                                 <option value="" selected disabled>Select Model</option>
-                                <option value="llama2">Llama 2</option>
+                                <option value="gemma:2b">Gemma 2B</option>
+                                <!-- <option value="llama2">Llama 2</option>
                                 <option value="codellama">Code Llama</option>
-                                <option value="mistral">Mistral</option>
+                                <option value="mistral">Mistral</option> -->
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="prompt" class="form-label">Prompt</label>
                             <textarea class="form-control" id="prompt" name="prompt" rows="4" required></textarea>
                         </div>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="context" class="form-label">Context (Optional)</label>
                             <textarea class="form-control" id="context" name="context" rows="3"></textarea>
-                        </div>
+                        </div> -->
                         <button type="submit" class="btn btn-primary w-100"><i class="fas fa-paper-plane me-2"></i>Send Request</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Response</h4>

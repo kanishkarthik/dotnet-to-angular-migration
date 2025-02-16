@@ -13,8 +13,6 @@ metadata_generator = MetadataGenerator(
     ASPNETMVC_APP_CONFIG_PATH,
     ANGULAR_APP_METADATA_PATH
 )
-ollama_service = OllamaService()
-
 @app.route("/")
 def index():
     return render_template("landing.html", active_page='home')
@@ -39,7 +37,8 @@ def process_ollama_request():
         raise ValueError("Model name and prompt are required!")
 
     try:
-        response = ollama_service.generate_response(model_name, prompt, context)
+        ollama_service = OllamaService(model_name)
+        response = ollama_service.generate_response(prompt, context)
         return jsonify({"response": response})
     except Exception as e:
         logger.error(f"Error in Ollama processing: {str(e)}")
