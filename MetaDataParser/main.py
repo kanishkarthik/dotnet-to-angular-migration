@@ -1,22 +1,26 @@
 from flask import Flask, render_template, request, jsonify
-from config.constants import ANGULAR_APP_METADATA_PATH, ASPNETMVC_APP_PATH
+from config.constants import ANGULAR_APP_METADATA_PATH, ASPNETMVC_APP_CONFIG_PATH
 from services.config_loader import load_configurations
 from services.metadata_generator import MetadataGenerator
 from decorators import handle_errors
 from utils.logger import logger
-#from services.ollama_service import OllamaService
+from services.ollama_service import OllamaService
 
 app = Flask(__name__)
 CONFIGURATIONS = load_configurations()
 metadata_generator = MetadataGenerator(
     CONFIGURATIONS,
-    ASPNETMVC_APP_PATH,
+    ASPNETMVC_APP_CONFIG_PATH,
     ANGULAR_APP_METADATA_PATH
 )
-#ollama_service = OllamaService()
+ollama_service = OllamaService()
 
 @app.route("/")
 def index():
+    return render_template("landing.html", active_page='home')
+
+@app.route("/metadata")
+def metadata_page():
     return render_template("main.html", active_page='metadata')
 
 @app.route("/ollama")
@@ -35,7 +39,7 @@ def process_ollama_request():
         raise ValueError("Model name and prompt are required!")
 
     try:
-        response = ""#ollama_service.generate_response(model_name, prompt, context)
+        response = ollama_service.generate_response(model_name, prompt, context)
         return jsonify({"response": response})
     except Exception as e:
         logger.error(f"Error in Ollama processing: {str(e)}")

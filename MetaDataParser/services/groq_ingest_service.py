@@ -10,7 +10,7 @@ from pathlib import Path
 from llama_index.core.storage import StorageContext
 from llama_index.core import load_index_from_storage
 
-from config.constants import ASPNETMVC_APP_PATH, GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL, ROOT_PATH, SAMPLE_METADATA_PATH, INDEX_STORAGE_PATH
+from config.constants import ASPNETMVC_APP_CONFIG_PATH, GROQ_API_KEY, GROQ_LARGE_LANGUAGE_MODEL, ROOT_PATH, SAMPLE_METADATA_PATH, INDEX_STORAGE_PATH
 from .base_llm_service import BaseLLMService
 from utils.logger import logger
 
@@ -69,7 +69,7 @@ class GroqIngestService(BaseLLMService):
             
             logger.info("No existing index found, creating new one")
             documents = SimpleDirectoryReader(
-                ASPNETMVC_APP_PATH,
+                ASPNETMVC_APP_CONFIG_PATH,
                 required_exts=[".cs"],
                 recursive=True
             ).load_data()

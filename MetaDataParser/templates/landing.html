@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - .NET to Angular Migration Tool{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron text-center mb-5">
+        <h1 class="display-4"><i class="fas fa-exchange-alt me-3"></i>.NET MVC to Angular Migration Tool</h1>
+        <p class="lead">Streamline your migration process from .NET MVC applications to modern Angular applications</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3><i class="fas fa-info-circle me-2"></i>About the Tool</h3>
+                    <p>This tool helps developers migrate their .NET MVC applications to Angular by:</p>
+                    <ul>
+                        <li>Analyzing existing .NET MVC structure</li>
+                        <li>Generating Angular component metadata</li>
+                        <li>Converting routing configurations</li>
+                        <li>Mapping controllers to services</li>
+                        <li>Transforming view models to interfaces</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3><i class="fas fa-tools me-2"></i>Features</h3>
+                    <ul>
+                        <li>Metadata Generation for Angular Components</li>
+                        <li>AI-Powered Code Analysis</li>
+                        <li>Intelligent Route Mapping</li>
+                        <li>Code Structure Recommendations</li>
+                        <li>Integration with Multiple AI Models</li>
+                    </ul>
+                    <div class="text-center mt-4">
+                        <a href="/metadata" class="btn btn-primary me-2">
+                            <i class="fas fa-cogs me-2"></i>Start Migration
+                        </a>
+                        <a href="/ollama" class="btn btn-success">
+                            <i class="fas fa-robot me-2"></i>AI Assistant
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

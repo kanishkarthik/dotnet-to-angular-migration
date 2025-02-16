@@ -21,7 +21,8 @@ ANGULAR_APP_METADATA_PATH = os.path.join(ROOT_PATH, "AngularApp", "src", "assets
 
 # ASP.NET MVC Configurations File
 ASPNETMVC_CONFIG_FILE = os.path.join(ROOT_PATH, "DotNetApp", "configurations.json")
-ASPNETMVC_APP_PATH = os.path.join(ROOT_PATH, "DotNetApp", "ViewConfigurations")
+ASPNETMVC_APP_CONFIG_PATH = os.path.join(ROOT_PATH, "DotNetApp", "ViewConfigurations")
+ASPNETMVC_APP_PATH = os.path.join(ROOT_PATH, "DotNetApp")
 SAMPLE_METADATA_PATH = os.path.join(ROOT_PATH,'MetaDataParser', 'config', 'sample_metadata.json')
 
 # Index Storage Path
