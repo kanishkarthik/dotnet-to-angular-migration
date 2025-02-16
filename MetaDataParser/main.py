@@ -4,6 +4,7 @@ from services.config_loader import load_configurations
 from services.metadata_generator import MetadataGenerator
 from decorators import handle_errors
 from utils.logger import logger
+#from services.ollama_service import OllamaService
 
 app = Flask(__name__)
 CONFIGURATIONS = load_configurations()
@@ -12,10 +13,33 @@ metadata_generator = MetadataGenerator(
     ASPNETMVC_APP_PATH,
     ANGULAR_APP_METADATA_PATH
 )
+#ollama_service = OllamaService()
 
 @app.route("/")
 def index():
-    return render_template("main.html")
+    return render_template("main.html", active_page='metadata')
+
+@app.route("/ollama")
+def ollama_page():
+    return render_template("ollama.html", active_page='ollama')
+
+@app.route("/api/ollama", methods=["POST"])
+@handle_errors
+def process_ollama_request():
+    data = request.json
+    model_name = data.get("model_name")
+    prompt = data.get("prompt")
+    context = data.get("context")
+
+    if not all([model_name, prompt]):
+        raise ValueError("Model name and prompt are required!")
+
+    try:
+        response = ""#ollama_service.generate_response(model_name, prompt, context)
+        return jsonify({"response": response})
+    except Exception as e:
+        logger.error(f"Error in Ollama processing: {str(e)}")
+        raise
 
 @app.route("/generate-metadata", methods=["POST"])
 @handle_errors
