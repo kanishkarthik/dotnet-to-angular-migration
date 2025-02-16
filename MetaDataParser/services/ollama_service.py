@@ -4,27 +4,35 @@ import chromadb
 from llama_index.core import (
     VectorStoreIndex,
     StorageContext,
-    Settings
+    Settings,
 )
 from llama_index.core.schema import Document
 from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.chroma import ChromaVectorStore
-from config.constants import ASPNETMVC_APP_PATH, CHROMA_DB_PATH
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.embeddings.google import GooglePaLMEmbedding
+from llama_index.embeddings.huggingface  import HuggingFaceEmbedding
+from config.constants import ASPNETMVC_APP_PATH, CHROMA_DB_PATH, GEMINI_API_KEY, GROQ_API_KEY
 from utils.logger import logger
 
 class OllamaRAGService:
-    def __init__(self, model_name: str):
+    def __init__(self, model_name: str, embedding_model: str = "local"):
         self.model_name = model_name
-        logger.info(f"Initializing OllamaRAGService with model: {model_name}")
+        self.embedding_model = embedding_model
+        logger.info(f"Initializing OllamaRAGService with model: {model_name}, embedding: {embedding_model}")
+
+        # Initialize embedding model based on choice
+        self.setup_embedding_model()
 
         # Initialize ChromaDB for persistent storage
         self.chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
         self.vector_store = ChromaVectorStore(chroma_collection=self.chroma_client.get_or_create_collection("dotnetapp"))
         self.storage_context = StorageContext.from_defaults(vector_store=self.vector_store)
 
-        # Set up LLM (Ollama)
+        # Set up LLM (Ollama) and configure settings
         self.llm = Ollama(model=model_name)
         Settings.llm = self.llm
+        Settings.embed_model = self.embed_model
 
         # Check if we need to reprocess C# files
         changed_files = self.needs_processing()
@@ -39,6 +47,28 @@ class OllamaRAGService:
 
         # Configure Query Engine with RAG
         self.query_engine = self.index.as_query_engine()
+
+    def setup_embedding_model(self):
+        """Initialize the appropriate embedding model based on configuration."""
+        if self.embedding_model == "local":
+            self.embed_model = None  # Will use default local embedding
+        elif self.embedding_model == "openai":
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY environment variable not set")
+            self.embed_model = OpenAIEmbedding(api_key=api_key)
+        elif self.embedding_model == "gemini":
+            api_key = os.getenv(GEMINI_API_KEY)
+            if not api_key:
+                raise ValueError("GOOGLE_API_KEY environment variable not set")
+            self.embed_model = GooglePaLMEmbedding(api_key=api_key)
+        elif self.embedding_model == "groq":
+            api_key = GROQ_API_KEY
+            if not api_key:
+                raise ValueError("GROQ_API_KEY environment variable not set")
+            self.embed_model = HuggingFaceEmbedding(api_key=api_key)
+        else:
+            raise ValueError(f"Unsupported embedding model: {self.embedding_model}")
 
     def needs_processing(self) -> list:
         """
@@ -115,10 +145,16 @@ class OllamaRAGService:
                 # Delete old entry if exists
                 self.vector_store.client.delete(ids=[file_path])
 
+                # Use the configured embedding model
+                if self.embedding_model == "local":
+                    embeddings = ollama.embeddings(model=self.model_name, prompt=content)["embedding"]
+                else:
+                    embeddings = self.embed_model.get_text_embedding(content)
+
                 # Store in ChromaDB
                 self.vector_store.client.add(
                     documents=[content],
-                    embeddings=[ollama.embeddings(model=self.model_name, prompt=content)["embedding"]],
+                    embeddings=[embeddings],
                     metadatas=[{"last_modified": os.path.getmtime(file_path)}],
                     ids=[file_path]
                 )
@@ -130,10 +166,12 @@ class OllamaRAGService:
 
         logger.info(f"Completed processing {processed_count} C# files.")
 
-        # Create LlamaIndex for fast retrieval
-        return VectorStoreIndex.from_vector_store(self.vector_store)
+        # Create LlamaIndex with service context
+        return VectorStoreIndex.from_vector_store(
+            self.vector_store
+        )
 
-    def generate_response(self, query: str) -> str:
+    def generate_response(self, query: str, context: str = '') -> str:
         """
         Uses RAG to retrieve relevant C# code snippets and generate a response.
         """
