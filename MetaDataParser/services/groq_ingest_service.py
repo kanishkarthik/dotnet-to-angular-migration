@@ -81,6 +81,8 @@ class GroqIngestService(BaseLLMService):
             base_query = (
                 f"Analyze the provided ASP.NET MVC codebase and generate JSON metadata only if "
                 f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
+                f"Please provide all the cs files which you have and provide list of the CS files you have used and indicate which ones were utilized for JSON preparation based on the specified country and payment method."
+                f"sample file name pattern: 1. INBFTConfiguration.cs or IndiaBKTConfiguration.cs"
             )
             
             if custom_prompt:
@@ -90,7 +92,7 @@ class GroqIngestService(BaseLLMService):
                 f"{base_query} Use the following sample structure as reference: {metadata_structure} "
                 f"but return empty json(example: {{}}) when no configuration found for {country_code} country "
                 f"and {payment_method} payment method and give only necessary fields only when it has value"
-                f"and file name sample structure: {country_code}{payment_method}Configuration.cs"
+               
             )
 
             query_engine = self.index.as_query_engine()

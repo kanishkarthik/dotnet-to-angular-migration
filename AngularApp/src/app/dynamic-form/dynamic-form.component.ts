@@ -67,13 +67,14 @@ export class DynamicFormComponent implements OnInit {
       this.formConfig.sections.forEach((section: any) => {
         if (section.section.toLowerCase().indexOf('PaymentMethod'.toLowerCase()) !== -1) {
           section.fields.forEach((field: any) => {
-            if (field.field === section.section+'_PaymentMethod') {
+            const fieldElm = field.field.toLowerCase();
+            if (fieldElm === (section.section+'_PaymentMethod').toLowerCase()) {
               field.value = redirectDataObj.paymentMethodDescription;
-            } else if (field.field === section.section+'_AccountNumber') {
+            } else if (fieldElm === (section.section+'_AccountNumber').toLowerCase()) {
               field.value = redirectDataObj.accountNumber;
-            } else if (field.field === section.section+'_PaymentCurrency') {
+            } else if (fieldElm === (section.section+'_PaymentCurrency').toLowerCase()) {
               field.value = redirectDataObj.currency;
-            } else if (field.field === section.section+'_AccountName') {
+            } else if (fieldElm === (section.section+'_AccountName').toLowerCase()) {
               field.value = redirectDataObj.accountName;
             }
             this.forms[section.section].patchValue({ [field.field]: field.value });
