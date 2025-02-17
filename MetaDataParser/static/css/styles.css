@@ -1,0 +1,13 @@
+#copy-button {
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+#copy-button:hover {
+    opacity: 1;
+}
+
+#ollama-response {
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+}

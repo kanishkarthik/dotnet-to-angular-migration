@@ -4,7 +4,7 @@ from services.config_loader import load_configurations
 from services.metadata_generator import MetadataGenerator
 from decorators import handle_errors
 from utils.logger import logger
-from services.ollama_service import OllamaRAGService
+from services.ollama_service import OllamaService
 
 app = Flask(__name__)
 CONFIGURATIONS = load_configurations()
@@ -30,6 +30,7 @@ def ollama_page():
 def process_ollama_request():
     data = request.json
     model_name = data.get("model_name")
+    embedding_model = data.get("embedding_model")
     prompt = data.get("prompt")
     context = data.get("context")
 
@@ -37,8 +38,8 @@ def process_ollama_request():
         raise ValueError("Model name and prompt are required!")
 
     try:
-        ollama_service = OllamaRAGService(model_name)
-        response = ollama_service.generate_response(prompt, context)
+        ollama_service = OllamaService(llm_model=model_name)
+        response = ollama_service.analyze(prompt)
         return jsonify({"response": response})
     except Exception as e:
         logger.error(f"Error in Ollama processing: {str(e)}")

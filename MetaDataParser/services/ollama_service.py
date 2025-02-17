@@ -1,202 +1,211 @@
-import os
-import ollama
-import chromadb
-from llama_index.core import (
-    VectorStoreIndex,
-    StorageContext,
-    Settings,
-)
-from llama_index.core.schema import Document
+import json
+import re
+from dotenv import load_dotenv
 from llama_index.llms.ollama import Ollama
+from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core import PromptTemplate, Settings
+from llama_index.core.embeddings import resolve_embed_model
+from llama_index.embeddings.ollama import OllamaEmbedding
+import os
+from llama_index.core.storage import StorageContext
+from llama_index.core import load_index_from_storage
 from llama_index.vector_stores.chroma import ChromaVectorStore
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.embeddings.google import GooglePaLMEmbedding
-from llama_index.embeddings.huggingface  import HuggingFaceEmbedding
-from config.constants import ASPNETMVC_APP_PATH, CHROMA_DB_PATH, GEMINI_API_KEY, GROQ_API_KEY
+from chromadb import PersistentClient
+import hashlib
+
+from config.constants import ASPNETMVC_APP_CONFIG_PATH, ASPNETMVC_APP_PATH, GROQ_API_KEY, CHROMA_DB_PATH
+from .base_llm_service import BaseLLMService
 from utils.logger import logger
 
-class OllamaRAGService:
-    def __init__(self, model_name: str, embedding_model: str = "local"):
-        self.model_name = model_name
-        self.embedding_model = embedding_model
-        logger.info(f"Initializing OllamaRAGService with model: {model_name}, embedding: {embedding_model}")
+load_dotenv()
+api_key = GROQ_API_KEY 
 
-        # Initialize embedding model based on choice
-        self.setup_embedding_model()
 
-        # Initialize ChromaDB for persistent storage
-        self.chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-        self.vector_store = ChromaVectorStore(chroma_collection=self.chroma_client.get_or_create_collection("dotnetapp"))
-        self.storage_context = StorageContext.from_defaults(vector_store=self.vector_store)
+class OllamaEmbeddingWrapper:
+    def __init__(self, embed_model):
+        self.embed_model = embed_model
 
-        # Set up LLM (Ollama) and configure settings
-        self.llm = Ollama(model=model_name)
+    def __call__(self, input):
+        if isinstance(input, str):
+            input = [input]
+        # Convert to the format expected by OllamaEmbedding
+        nodes = [{"text": text} for text in input]
+        return self.embed_model.get_text_embedding_batch(nodes)
+
+
+class OllamaService(BaseLLMService):
+    def __init__(self, llm_model: str, clear_index: bool = False):
+        logger.info("Initializing Ollama Service")
+        super().__init__()
+        self.llm = Ollama(
+            model=llm_model,
+            base_url="http://localhost:11434/",
+            temperature=0.1
+        )
+        self.embed_model = OllamaEmbedding(
+            model_name=llm_model,
+            base_url="http://localhost:11434",
+            ollama_additional_kwargs={"mirostat": 0}
+        )
+        
+        self._setup_settings()
+        
+        if clear_index:
+            self.clear_index()
+            
+        self.index = self._load_or_create_index()
+
+    def clear_index(self):
+        """Clear the existing index storage"""
+        logger.info("Attempting to clear existing index")
+        try:
+            if os.path.exists(CHROMA_DB_PATH):
+                import shutil
+                shutil.rmtree(CHROMA_DB_PATH)
+                logger.info("Successfully cleared existing index")
+            else:
+                logger.info("No existing index found to clear")
+        except Exception as e:
+            logger.error(f"Error clearing index: {str(e)}")
+            raise RuntimeError(f"Failed to clear index: {e}")
+
+    def _setup_settings(self):
+        logger.info("Setting up Ollama Ingest settings")
         Settings.llm = self.llm
+        Settings.num_output = 250
         Settings.embed_model = self.embed_model
 
-        # Check if we need to reprocess C# files
-        changed_files = self.needs_processing()
-        if changed_files:
-            logger.info(f"Changes detected in {len(changed_files)} C# files, updating index.")
-            self.index = self.build_index(changed_files)
-        else:
-            logger.info("No changes detected in C# files, loading existing index.")
-            self.index = VectorStoreIndex.from_vector_store(
-                self.vector_store
+    def _calculate_documents_hash(self):
+        """Calculate a hash of all documents to detect changes"""
+        hash_str = ""
+        for root, _, files in os.walk(ASPNETMVC_APP_CONFIG_PATH):
+            for file in sorted(files):
+                if file.endswith('.cs'):
+                    file_path = os.path.join(root, file)
+                    with open(file_path, 'rb') as f:
+                        hash_str += hashlib.md5(f.read()).hexdigest()
+        return hashlib.md5(hash_str.encode()).hexdigest()
+
+    def _get_embedding_dimension(self):
+        """Get the embedding dimension of the current model"""
+        try:
+            # Get dimension by embedding a test string
+            test_embedding = self.embed_model.get_text_embedding("test")
+            return len(test_embedding)
+        except Exception as e:
+            logger.error(f"Error getting embedding dimension: {str(e)}")
+            raise
+
+    def _load_existing_index(self, collection):
+        """Attempt to load existing index"""
+        try:
+            # Get current model's embedding dimension
+            current_dimension = self._get_embedding_dimension()
+            
+            # Check stored dimension
+            metadata = collection.get(where={"type": "embedding_info"})
+            if not metadata or not metadata['metadatas']:
+                logger.info("No embedding dimension info found")
+                return None
+                
+            stored_dimension = metadata['metadatas'][0].get('dimension')
+            if stored_dimension != current_dimension:
+                logger.info(f"Embedding dimension mismatch: stored={stored_dimension}, current={current_dimension}")
+                return None
+
+            vector_store = ChromaVectorStore(chroma_collection=collection)
+            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            index = VectorStoreIndex.from_vector_store(
+                vector_store,
+                storage_context=storage_context,
+                embed_model=self.embed_model
+            )
+            return index
+        except Exception as e:
+            logger.info(f"Could not load existing index: {str(e)}")
+            return None
+
+    def _load_or_create_index(self):
+        logger.info("Checking for existing index")
+        try:
+            chroma_client = PersistentClient(path=CHROMA_DB_PATH)
+            collection_name = "dotnetapp"
+            
+            # Get current embedding dimension
+            current_dimension = self._get_embedding_dimension()
+            
+            # Check if collection exists
+            if collection_name in chroma_client.list_collections():
+                collection = chroma_client.get_collection(collection_name)
+                current_hash = self._calculate_documents_hash()
+                
+                try:
+                    stored_hash = collection.get(where={"type": "document_hash"})
+                    if stored_hash and stored_hash['documents'][0] == current_hash:
+                        logger.info("Documents unchanged, attempting to load existing index")
+                        existing_index = self._load_existing_index(collection)
+                        if existing_index:
+                            logger.info("Successfully loaded existing index")
+                            return existing_index
+                except Exception as e:
+                    logger.info(f"Error checking document hash: {str(e)}")
+
+            # If we reach here, we need to create a new index
+            logger.info("Creating new index")
+            if collection_name in chroma_client.list_collections():
+                chroma_client.delete_collection(collection_name)
+            collection = chroma_client.create_collection(name=collection_name)
+            
+            # Store the hash and embedding dimension
+            current_hash = self._calculate_documents_hash()
+            collection.add(
+                documents=[current_hash],
+                metadatas=[{"type": "document_hash"}],
+                ids=["document_hash"]
+            )
+            collection.add(
+                documents=["embedding_info"],
+                metadatas=[{"type": "embedding_info", "dimension": current_dimension}],
+                ids=["embedding_info"]
             )
 
-        # Configure Query Engine with RAG
-        self.query_engine = self.index.as_query_engine()
+            # Create new index
+            vector_store = ChromaVectorStore(chroma_collection=collection)
+            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            
+            documents = SimpleDirectoryReader(
+                ASPNETMVC_APP_PATH,
+                required_exts=[".cs"],
+                recursive=True
+            ).load_data()
+            
+            index = VectorStoreIndex.from_documents(
+                documents,
+                storage_context=storage_context,
+                embed_model=self.embed_model
+            )
+            
+            logger.info(f"New index created successfully with dimension {current_dimension}")
+            return index
 
-    def setup_embedding_model(self):
-        """Initialize the appropriate embedding model based on configuration."""
-        if self.embedding_model == "local":
-            self.embed_model = None  # Will use default local embedding
-        elif self.embedding_model == "openai":
-            api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
-                raise ValueError("OPENAI_API_KEY environment variable not set")
-            self.embed_model = OpenAIEmbedding(api_key=api_key)
-        elif self.embedding_model == "gemini":
-            api_key = os.getenv(GEMINI_API_KEY)
-            if not api_key:
-                raise ValueError("GOOGLE_API_KEY environment variable not set")
-            self.embed_model = GooglePaLMEmbedding(api_key=api_key)
-        elif self.embedding_model == "groq":
-            api_key = GROQ_API_KEY
-            if not api_key:
-                raise ValueError("GROQ_API_KEY environment variable not set")
-            self.embed_model = HuggingFaceEmbedding(api_key=api_key)
-        else:
-            raise ValueError(f"Unsupported embedding model: {self.embedding_model}")
+        except Exception as e:
+            logger.error(f"Error in index loading/creation: {str(e)}")
+            raise
 
-    def needs_processing(self) -> list:
-        """
-        Checks if C# files have changed and returns list of files that need reprocessing.
-        """
-        logger.info("Checking if C# files need processing...")
-        changed_files = []
+    def analyze(self, prompt: str) -> str:
+        logger.info(f"Starting analysis with prompt: {prompt}")
+        try:
+            query_engine = self.index.as_query_engine(
+                response_mode="tree_summarize",
+                streaming=True
+            )
+            
+            response = query_engine.query(prompt)
+            logger.info("Successfully received response from query engine")
+            
+            return str(response)
+        except Exception as e:
+            logger.error(f"Error in analysis: {str(e)}")
+            raise RuntimeError(f"Error in analysis process: {e}")
 
-        # Get collection info
-        collection = self.chroma_client.get_collection("dotnetapp")
-        if collection.count() == 0:
-            # Get all .cs files if no index exists
-            for root, _, files in os.walk(ASPNETMVC_APP_PATH):
-                for file in files:
-                    if file.endswith(".cs") and "Core" not in file:
-                        changed_files.append(os.path.join(root, file))
-            return changed_files
 
-        # Get stored documents and their metadata
-        stored_data = collection.get(include=["metadatas"])
-        stored_metadatas = stored_data.get("metadatas", [])
-        stored_ids = stored_data.get("ids", [])
-
-        # Create a mapping of file paths to their last modified times
-        stored_file_times = {
-            file_id: metadata.get("last_modified", 0)
-            for file_id, metadata in zip(stored_ids, stored_metadatas)
-        }
-
-        scan_dirs = ["Controllers", "ViewConfigurations", "ViewModels", "Views"]
-
-        # Check current files
-        for root, _, files in os.walk(ASPNETMVC_APP_PATH):
-            if not any(scan_dir in root for scan_dir in scan_dirs):
-                continue
-
-            for file in files:
-                if file.endswith(".cs") and "Core" not in file:
-                    file_path = os.path.join(root, file)
-                    current_mtime = os.path.getmtime(file_path)
-
-                    # Check if file is new or modified
-                    if file_path in stored_file_times:
-                        if current_mtime > stored_file_times[file_path]:
-                            changed_files.append(file_path)
-                    else:
-                        changed_files.append(file_path)
-
-        # Handle deleted files
-        for stored_id in stored_ids:
-            if not os.path.exists(stored_id):
-                self.vector_store.client.delete(ids=[stored_id])
-
-        return changed_files
-
-    def build_index(self, changed_files: list):
-        """
-        Reads and indexes only the changed C# files, updating ChromaDB.
-        """
-        logger.info(f"Building index for {len(changed_files)} C# files...")
-        documents = []
-        processed_count = 0
-
-        for file_path in changed_files:
-            logger.info(f"Processing C# file: {file_path}")
-
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = self.extract_relevant_content(f.read())
-
-                doc = Document(text=content, metadata={"file_path": file_path})
-                documents.append(doc)
-
-                # Delete old entry if exists
-                self.vector_store.client.delete(ids=[file_path])
-
-                # Use the configured embedding model
-                if self.embedding_model == "local":
-                    embeddings = ollama.embeddings(model=self.model_name, prompt=content)["embedding"]
-                else:
-                    embeddings = self.embed_model.get_text_embedding(content)
-
-                # Store in ChromaDB
-                self.vector_store.client.add(
-                    documents=[content],
-                    embeddings=[embeddings],
-                    metadatas=[{"last_modified": os.path.getmtime(file_path)}],
-                    ids=[file_path]
-                )
-                processed_count += 1
-                logger.info(f"Successfully indexed: {file_path}")
-
-            except Exception as e:
-                logger.error(f"Error processing {file_path}: {str(e)}")
-
-        logger.info(f"Completed processing {processed_count} C# files.")
-
-        # Create LlamaIndex with service context
-        return VectorStoreIndex.from_vector_store(
-            self.vector_store
-        )
-
-    def generate_response(self, query: str, context: str = '') -> str:
-        """
-        Uses RAG to retrieve relevant C# code snippets and generate a response.
-        """
-        logger.info(f"Generating response for: {query}")
-
-        # Retrieve relevant C# code snippets
-        retrieved_docs = self.query_engine.query(query).response
-
-        # Ensure retrieved docs are properly formatted
-        if isinstance(retrieved_docs, str):
-            logger.warning("Retrieved response is a string instead of a document. Adjusting format.")
-            retrieved_docs = f"Extracted Content:\n{retrieved_docs}"
-
-        final_prompt = f"Context:\n{retrieved_docs}\n\nUser Query: {query}"
-        response = ollama.generate(model=self.model_name, prompt=final_prompt)
-
-        return response["response"]
-
-    @staticmethod
-    def extract_relevant_content(content: str) -> str:
-        """
-        Extracts meaningful sections of C# code to improve embeddings.
-        """
-        return "\n".join(line.strip() for line in content.split("\n") if line.strip().startswith(("class", "public", "private", "//")))
-
-    def close(self):
-        logger.info("Closing ChromaDB connection")
-        self.chroma_client.close()

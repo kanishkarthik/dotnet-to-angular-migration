@@ -10,6 +10,9 @@ GROQ_LARGE_LANGUAGE_MODEL = "llama-3.3-70b-versatile"
 # Gemini API Key
 GEMINI_API_KEY = "AIzaSyANB3nTAyUGRfMmpYQp73hI-3ZUyAp5Q-k"
 
+# OpenAI API Key
+OPENAI_API_KEY = "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"
+
 # Gemini Model
 GEMINI_MODEL = "gemini-1.5-pro-latest"
 
@@ -31,4 +34,4 @@ LOG_DIR_PATH = os.path.join(ROOT_PATH, 'logs')
 INDEX_STORAGE_PATH = os.path.join(ROOT_PATH, 'storage', 'vector_index')
 
 # Chroma Db Path
-CHROMA_DB_PATH = os.path.join(ROOT_PATH, 'chroma_db')
+CHROMA_DB_PATH = os.path.join(ROOT_PATH, 'storage', 'chroma_db')

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Ollama Integration{% endblock %}
+{% block title %}Ollama RAG Integration{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -8,40 +8,59 @@
         <div class="col-md-5">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-robot me-2"></i>Ollama Configuration</h4>
+                    <h4 class="mb-0"><i class="fas fa-robot me-2"></i>Ollama RAG Configuration</h4>
                 </div>
                 <div class="card-body">
                     <form id="ollama-form">
                         <div class="mb-3">
                             <label for="model_name" class="form-label">Model Name</label>
                             <select class="form-control" id="model_name" name="model_name" required>
-                                <option value="" selected disabled>Select Model</option>
+                                <option value="" disabled>Select Model</option>
                                 <option value="gemma:2b">Gemma 2B</option>
                                 <option value="llama2">Llama 2</option>
-                                <option value="codellama">Code Llama</option>
+                                <option value="codellama" selected>Code Llama</option>
                                 <option value="mistral">Mistral</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="prompt" class="form-label">Prompt</label>
-                            <textarea class="form-control" id="prompt" name="prompt" rows="4" required></textarea>
+                            <label for="embedding_model" class="form-label">Embedding Model</label>
+                            <select class="form-control" id="embedding_model" name="embedding_model" required>
+                                <option value="local" selected>Local (Ollama)</option>
+                            </select>
                         </div>
-                        <div class="mb-3" style="display: none;">
-                            <label for="context" class="form-label">Context (Optional)</label>
-                            <textarea class="form-control" id="context" name="context" rows="3"></textarea>
+                        <div class="mb-3">
+                            <label for="prompt" class="form-label">Question about C# Codebase</label>
+                            <textarea class="form-control" id="prompt" name="prompt" 
+                                placeholder="Ask questions about the .NET MVC codebase..." rows="4" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-paper-plane me-2"></i>Send Request</button>
+                        <div class="mb-3">
+                            <label for="context" class="form-label">Additional Context (Optional)</label>
+                            <textarea class="form-control" id="context" name="context" 
+                                placeholder="Add any additional context..." rows="2"></textarea>
+                        </div>
+                        <div id="loading-spinner" class="d-none text-center mb-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Generate Response
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-md-7">
             <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-reply me-2"></i>Response</h4>
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-reply me-2"></i>RAG-Enhanced Response</h4>
+                    <button id="copy-button" class="btn btn-light btn-sm" data-bs-toggle="tooltip" title="Copy to clipboard">
+                        <i class="fas fa-copy"></i>
+                    </button>
                 </div>
                 <div class="card-body">
-                    <pre id="ollama-response" class="mb-0">Response will appear here...</pre>
+                    <div id="error-display" class="alert alert-danger d-none" style="display: none;"></div>
+                    <pre id="ollama-response" class="mb-0 p-3 bg-light position-relative">Responses will include relevant C# code context...</pre>
                 </div>
             </div>
         </div>
