@@ -64,7 +64,13 @@ namespace DotNetApp.ViewConfigurations.NAM.US.BKT
             ConfigureModel(model => model.OrderingPartyDetails.Name)
               .Name("Ordering Party Name")
               .Type("textbox")
+              .MaxLength(20)
               .Pattern("[a-zA-Z0-9]+");
+
+            ConfigureModel(model => model.OrderingPartyDetails.Address)
+              .Name("Ordering Party Address")
+              .Required(true)
+              .Type("textarea");
         }
     }
 }

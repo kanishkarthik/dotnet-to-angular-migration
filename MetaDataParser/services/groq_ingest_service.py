@@ -15,8 +15,7 @@ from .base_llm_service import BaseLLMService
 from utils.logger import logger
 
 load_dotenv()
-api_key = GROQ_API_KEY 
-
+api_key = GROQ_API_KEY
 
 class GroqIngestService(BaseLLMService):
     def __init__(self, llm_model: str, clear_index: bool = False):
@@ -27,6 +26,7 @@ class GroqIngestService(BaseLLMService):
         self._setup_settings()
         
         if clear_index:
+            logger.info("Clearing existing index based on the reindex request")
             self.clear_index()
             
         self.index = self._load_or_create_index()
@@ -84,12 +84,13 @@ class GroqIngestService(BaseLLMService):
             )
             
             if custom_prompt:
-                base_prompt = "{}{}.".format(base_prompt, custom_prompt)
+                base_query = "{}{}.".format(base_query, custom_prompt)
 
             query = (
                 f"{base_query} Use the following sample structure as reference: {metadata_structure} "
                 f"but return empty json(example: {{}}) when no configuration found for {country_code} country "
                 f"and {payment_method} payment method and give only necessary fields only when it has value"
+                f"and file name sample structure: {country_code}{payment_method}Configuration.cs"
             )
 
             query_engine = self.index.as_query_engine()

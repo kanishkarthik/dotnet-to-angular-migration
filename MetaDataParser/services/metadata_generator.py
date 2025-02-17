@@ -12,7 +12,7 @@ class MetadataGenerator:
         self.aspnet_path = aspnet_path
         self.angular_path = angular_path
 
-    def generate(self, country_code: str, payment_method: str, ai_model: str, llm_model: str, custom_prompt: str = None) -> str:
+    def generate(self, country_code: str, payment_method: str, ai_model: str, llm_model: str, re_index: bool = False, custom_prompt: str = None) -> str:
         logger.info(f"Starting metadata generation for country: {country_code}, payment method: {payment_method}, AI model: {ai_model}, LLM model: {llm_model}")
         logger.info(f"Custom prompt: {custom_prompt if custom_prompt else 'None'}")
         key = f"{country_code.lower()}_{payment_method.lower()}"
@@ -25,7 +25,7 @@ class MetadataGenerator:
                     raise ValueError(f"No configuration found for {key}")
                 baseConfig = self.config.get("base")
                 file_content = self._read_cs_file(baseConfig.get('config_path'), config.get("config_path"))
-            metadata = self._analyze_content(file_content, ai_model, llm_model, country_code, payment_method, custom_prompt)
+            metadata = self._analyze_content(file_content, ai_model, llm_model, country_code, payment_method, re_index, custom_prompt)
             logger.info(f"Generated metadata: {metadata}")
             # check metadata is empty string or empty json object
             if metadata and metadata.strip() != "{}":
@@ -53,12 +53,12 @@ class MetadataGenerator:
             filecontent = filecontent + f.read()
         return filecontent
     
-    def _analyze_content(self, content: str, ai_model: str, llm_model: str, country_code: str, payment_method: str, custom_prompt: str = None) -> str:
+    def _analyze_content(self, content: str, ai_model: str, llm_model: str, country_code: str, payment_method: str, re_index: bool = False, custom_prompt: str = None) -> str:
         logger.info(f"Analyzing content using {ai_model}")
         if ai_model == 'groq':
             return GroqService(llm_model).analyze(content, custom_prompt)
         elif ai_model == 'groq_ingest':
-            return GroqIngestService(llm_model, False).analyze(country_code, payment_method, custom_prompt)
+            return GroqIngestService(llm_model, clear_index=re_index).analyze(country_code, payment_method, custom_prompt)
         elif ai_model == 'gemini':
             return GeminiService(llm_model).analyze(content, custom_prompt)
         else:

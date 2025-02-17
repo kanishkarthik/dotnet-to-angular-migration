@@ -56,6 +56,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     const ai_model = document.getElementById("ai_model").value;    
     const llm_model = document.getElementById("llm_model").value;
     const customPrompt = document.getElementById("custom_prompt").value;
+    const reindex = document.getElementById("reindex")?.checked || false;
     const output = document.getElementById("output");
     const previewBtn = document.getElementById("previewBtn");
     const copyBtn = document.getElementById("copyBtn");
@@ -65,10 +66,23 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     copyBtn.style.display = 'none';
 
     try {
+        const formData = new URLSearchParams({
+            country_code: countryCode,
+            payment_method: paymentMethod,
+            ai_model: ai_model,
+            llm_model: llm_model,
+            custom_prompt: customPrompt
+        });
+
+        // Only include reindex parameter if Groq Ingest is selected
+        if (ai_model === 'groq_ingest') {
+            formData.append('re_index', reindex);
+        }
+
         const response = await fetch("/generate-metadata", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `country_code=${encodeURIComponent(countryCode)}&payment_method=${encodeURIComponent(paymentMethod)}&ai_model=${encodeURIComponent(ai_model)}&llm_model=${encodeURIComponent(llm_model)}&custom_prompt=${encodeURIComponent(customPrompt)}`
+            body: formData
         });
 
         if (response.ok) {
@@ -106,4 +120,27 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     } catch (error) {
         output.innerHTML = `<div class="alert alert-danger" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Network Error: ${error.message}</div>`;
     }
+});
+
+// Add event listener for AI model change to handle reindex visibility
+document.getElementById('ai_model').addEventListener('change', function() {
+    const reindexContainer = document.getElementById('reindex-container');
+    if (this.value === 'groq_ingest') {
+        reindexContainer.classList.remove('d-none');
+    } else {
+        reindexContainer.classList.add('d-none');
+        document.getElementById('reindex').checked = false;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const aiModelSelect = document.getElementById('ai_model');
+    const reindexContainer = document.getElementById('reindexContainer');
+
+    aiModelSelect.addEventListener('change', function() {
+        reindexContainer.style.display = this.value === 'groq_ingest' ? 'block' : 'none';
+        if (this.value !== 'groq_ingest') {
+            document.getElementById('reindex').checked = false;
+        }
+    });
 });
