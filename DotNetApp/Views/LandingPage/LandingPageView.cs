@@ -9,6 +9,11 @@ using Models = Application.ViewModels;
 
 namespace Application.Views.LandingPage
 {
+    /// <summary>
+    /// Landing page view component for the legacy ASP.NET MVC application.
+    /// This class handles the rendering of the landing page UI elements using traditional
+    /// server-side rendering approach typical in ASP.NET MVC applications.
+    /// </summary>
     public class LandingPageView : BaseView<LandingPagModel>
     {
         public override string ConfigreStyles()

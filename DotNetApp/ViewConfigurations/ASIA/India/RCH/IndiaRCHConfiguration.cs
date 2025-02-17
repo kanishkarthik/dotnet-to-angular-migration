@@ -25,6 +25,7 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.RCH
                 .Name("Transaction Reference Number")
                 .Type("textbox")
                 .Required(true)
+                .MaxLength(20)
                 .Pattern("[a-zA-Z0-9]+");
 
             ConfigureModel(model => model.PaymentDetails.ValueDate)
