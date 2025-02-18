@@ -10,9 +10,6 @@ GROQ_LARGE_LANGUAGE_MODEL = "llama-3.3-70b-versatile"
 # Gemini API Key
 GEMINI_API_KEY = "AIzaSyANB3nTAyUGRfMmpYQp73hI-3ZUyAp5Q-k"
 
-# OpenAI API Key
-OPENAI_API_KEY = ""
-
 # Gemini Model
 GEMINI_MODEL = "gemini-1.5-pro-latest"
 

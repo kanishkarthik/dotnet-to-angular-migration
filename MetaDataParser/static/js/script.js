@@ -80,7 +80,8 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
             payment_method: paymentMethod,
             ai_model: ai_model,
             llm_model: llm_model,
-            custom_prompt: customPrompt
+            custom_prompt: customPrompt,
+            save_metadata: document.getElementById("save_metadata").checked
         });
 
         // Only include reindex parameter if Groq Ingest is selected
