@@ -1,7 +1,7 @@
 import os
 
 # Groq API Key and Endpoint
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 # "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"
 
 # Groq (LLM)
@@ -32,6 +32,7 @@ LOG_DIR_PATH = os.path.join(ROOT_PATH, 'logs')
 
 # Index Storage Path
 INDEX_STORAGE_PATH = os.path.join(ROOT_PATH, 'storage', 'vector_index')
+INDEX_STORAGE_PATH_2 = os.path.join(ROOT_PATH, 'storage', 'vector_index_2')
 
 # Chroma Db Path
 CHROMA_DB_PATH = os.path.join(ROOT_PATH, 'storage', 'chroma_db')

@@ -13,6 +13,13 @@
                 <div class="card-body">
                     <form id="ollama-form">
                         <div class="mb-3">
+                            <label for="embedding_model" class="form-label">Embedding Model</label>
+                            <select class="form-control" id="embedding_model" name="embedding_model" required>
+                                <option value="local" selected>Local (Ollama)</option>
+                                <option value="groq" selected>Groq/option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="model_name" class="form-label">Model Name</label>
                             <select class="form-control" id="model_name" name="model_name" required>
                                 <option value="" disabled>Select Model</option>
@@ -20,14 +27,9 @@
                                 <option value="llama2">Llama 2</option>
                                 <option value="codellama" selected>Code Llama</option>
                                 <option value="mistral">Mistral</option>
+                                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
                             </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="embedding_model" class="form-label">Embedding Model</label>
-                            <select class="form-control" id="embedding_model" name="embedding_model" required>
-                                <option value="local" selected>Local (Ollama)</option>
-                            </select>
-                        </div>
+                        </div>                        
                         <div class="mb-3">
                             <label for="prompt" class="form-label">Question about C# Codebase</label>
                             <textarea class="form-control" id="prompt" name="prompt" 

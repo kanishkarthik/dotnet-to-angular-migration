@@ -11,8 +11,13 @@ namespace DotNetApp.ViewConfigurations.NAM.US.CBFT
 
         public override void ConfigureModel()
         {
+            //Order 1
             ConfigurePaymentMethod();
+
+            //Order 2
             ConfigurePaymentDetails();
+
+            //Order 3
             ConfigureBeneficiaryDetails();
         }
         private void ConfigurePaymentDetails()
