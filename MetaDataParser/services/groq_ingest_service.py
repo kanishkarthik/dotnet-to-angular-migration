@@ -75,25 +75,48 @@ class GroqIngestService(BaseLLMService):
             raise
 
     def analyze(self, country_code: str, payment_method: str, custom_prompt: str = None) -> str:
-        logger.info(f"Starting Groq Ingest analysis for country: {country_code}, payment method: {payment_method}")
+        # get region by country code
+        region = self._get_region(country_code)
+        logger.info(f"Starting Groq Ingest analysis for region: {region}, country: {country_code}, payment method: {payment_method}")
         try:
             metadata_structure = self.metadata_structure
+            # base_query = (
+            #     f"Analyze the provided ASP.NET MVC codebase and generate JSON metadata only if"
+            #     f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
+            #     f"Please provide all the cs files which you have and provide list of the CS files you have used and indicate which ones were utilized for JSON preparation based on the specified country and payment method."
+            #     f"sample file name pattern: 1. INBFTConfiguration.cs or IndiaBKTConfiguration.cs. 2. UnitedStateBKTConfiguration.cs or USBKTConfiguration.cs"
+            #     f"look under the {region} folder to identify the {country_code} {payment_method} configuration file"
+            # )
+                # f"4. Identify inheritance relationships:"
+                #f"  - If a configuration file (e.g., USBKTConfiguration.cs) inherits from another file (e.g., BaseViewConfiguration.cs), include the base class details(e.g ConfigurePaymentMethod) while processing"
+              
             base_query = (
-                f"Analyze the provided ASP.NET MVC codebase and generate JSON metadata only if "
-                f"there are explicit configurations or implementations for {country_code} country and {payment_method} payment method is found and both should exist not either one."
-                f"Please provide all the cs files which you have and provide list of the CS files you have used and indicate which ones were utilized for JSON preparation based on the specified country and payment method."
-                f"sample file name pattern: 1. INBFTConfiguration.cs or IndiaBKTConfiguration.cs"
+                "Analyze the provided ASP.NET MVC codebase and generate JSON metadata only if there are "
+                "explicit configurations or implementations for:\n"
+                f"- Country: {country_code}\n"
+                f"- Payment Method: {payment_method}\n\n"
+                "Both conditions must be met; metadata should not be generated if only one of them exists.\n\n"
+                "Steps to Follow:\n"
+                "1. Identify all C# (.cs) files in the provided codebase.\n"
+                f"2. Check under the {region} folder for configuration files related to {country_code} and {payment_method} payment methods.\n"
+                "3. Look for configuration file names that match patterns such as:\n"
+                f"   - {country_code}{payment_method}Configuration.cs\n"
+                "4. List all C# files found in the project.\n"
+                "5. Clearly indicate which files were used to generate the JSON metadata.\n"
+                f"6. If both {country_code} and {payment_method}-specific configurations exist, extract relevant implementation details "
+                "and generate JSON metadata accordingly.\n"
             )
             
             if custom_prompt:
                 base_query = "{}{}.".format(base_query, custom_prompt)
 
             query = (
-                f"{base_query} Use the following sample structure as reference: {metadata_structure} "
+                f"{base_query} Use the following sample json structure as reference: {metadata_structure} "
                 f"but return empty json(example: {{}}) when no configuration found for {country_code} country "
-                f"and {payment_method} payment method and give only necessary fields only when it has value"
-               
+                f"and {payment_method} payment method and give only necessary fields only when it has value"               
             )
+
+            logger.info(f"Querying Groq Ingest engine: {query}")
 
             query_engine = self.index.as_query_engine()
             

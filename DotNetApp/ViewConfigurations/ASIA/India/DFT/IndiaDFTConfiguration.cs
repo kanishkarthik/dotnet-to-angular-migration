@@ -23,6 +23,31 @@ namespace DotNetApp.ViewConfigurations.ASIA.India.DFT
             ConfigureAdditionalOptions();
         }
 
+        public new void ConfigurePaymentMethod()
+        {
+            ConfigureModel(model => model.PaymentMethod.AccountNumber)
+                .Name("Account Number")
+                .Type("label");
+
+            ConfigureModel(model => model.PaymentMethod.PaymentCurrency)
+                .Name("Payment Currency")
+                .Type("label");
+
+            ConfigureModel(model => model.PaymentMethod.Amount)
+                .Name("Payment Amount")
+                .Type("textbox")
+                .MaxLength(6)
+                .Required(true);
+
+            ConfigureModel(model => model.PaymentMethod.AccountName)
+                .Name("Account Name")
+                .Type("label");
+
+            ConfigureModel(model => model.PaymentMethod.PaymentMethod)
+                .Name("Payment Method")
+                .Type("label");
+        }
+
         private void ConfigureTransferDetails()
         {
             ConfigureModel(model => model.TransferDetails.TransferReferenceNumber)

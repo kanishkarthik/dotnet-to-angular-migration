@@ -5,9 +5,22 @@ from config.constants import SAMPLE_METADATA_PATH
 from utils.logger import logger
 
 class BaseLLMService(ABC):
+    # create list for mapping region with country code
+    REGION_COUNTRY_MAPPING = {
+        "ASIA": ["IN"],
+        "EMEA": [""],
+        "LATAM": ["BR"],
+        "NAM": ["US"]
+    }
     def __init__(self):
         self.metadata_structure = self._load_metadata_structure()
 
+    def _get_region(self, country_code: str):
+        for region, countries in self.REGION_COUNTRY_MAPPING.items():
+            if country_code in countries:
+                return region
+        return ""
+        
     def _load_metadata_structure(self) -> str:
         with open(SAMPLE_METADATA_PATH, 'r') as file:
             return file.read()
@@ -21,7 +34,7 @@ class BaseLLMService(ABC):
                 return cleaned_json
             except json.JSONDecodeError as e:
                 print(f"Invalid JSON: {e}")
-        logger.info("No JSON found in the text.")
+        logger.info("No JSON found in the text. Trying to extract from the response")
         
         match = re.search(r'({.*})', response_text, re.DOTALL)
         if match:

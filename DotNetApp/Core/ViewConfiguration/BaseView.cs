@@ -85,7 +85,8 @@ namespace DotNetApp.Core.ViewConfiguration
                 }
                 else if (property.Type == "textbox")
                 {
-                    controls.AppendLine(string.Format("<input type='text' id='{0}' name='{0}' />", property.Id));
+                    var maxLengthStr = property.MaxLength > 0 ? string.Format("maxlength={0}", property.MaxLength): "";
+                    controls.AppendLine(string.Format("<input type='text' id='{0}' name='{0}' {1}/>", property.Id, maxLengthStr));
                 }
                 else if (property.Type == "date")
                 {
