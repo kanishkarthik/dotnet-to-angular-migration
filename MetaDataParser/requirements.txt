@@ -11,3 +11,4 @@ llama-index-llms-ollama
 llama-index-vector-stores-chroma
 llama-index-embeddings-google
 llama_index.embeddings.ollama
+llama-index-llms-gemini

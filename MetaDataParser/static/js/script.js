@@ -14,7 +14,11 @@ const llmModelOptions = {
     ],
     gemini: [
         { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro' }
-    ]
+    ],
+    gemini_ingest: [
+        { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro' }
+    ],
+
 };
 
 document.getElementById("ai_model").addEventListener("change", function() {

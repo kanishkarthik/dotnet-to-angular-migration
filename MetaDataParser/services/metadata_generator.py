@@ -18,7 +18,7 @@ class MetadataGenerator:
         key = f"{country_code.lower()}_{payment_method.lower()}"
         file_content = ''
         try:
-            if ai_model != 'groq_ingest':
+            if ai_model != 'groq_ingest' and ai_model != 'gemini_ingest':
                 config = self.config.get(key)
                 if not config:
                     logger.error(f"No configuration found for {key}")
@@ -57,10 +57,12 @@ class MetadataGenerator:
         logger.info(f"Analyzing content using {ai_model}")
         if ai_model == 'groq':
             return GroqService(llm_model).analyze(content, custom_prompt)
-        elif ai_model == 'groq_ingest':
-            return GroqIngestService(llm_model, clear_index=re_index).analyze(country_code, payment_method, custom_prompt)
         elif ai_model == 'gemini':
             return GeminiService(llm_model).analyze(content, custom_prompt)
+        elif ai_model == 'groq_ingest':
+            return GroqIngestService(llm_model, clear_index=re_index).analyze(country_code, payment_method, custom_prompt)
+        # elif ai_model == 'groq_ingest':
+        #     return GeminiIngestService(llm_model, clear_index=re_index).analyze(country_code, payment_method, custom_prompt)
         else:
             raise ValueError(f"Unsupported AI model: {ai_model}")
 
