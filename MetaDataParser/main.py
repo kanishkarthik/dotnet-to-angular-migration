@@ -5,6 +5,7 @@ from services.metadata_generator import MetadataGenerator
 from decorators import handle_errors
 from utils.logger import logger
 from services.ollama_service import OllamaService
+from services.train_model import ModelTrainer
 
 app = Flask(__name__)
 CONFIGURATIONS = load_configurations()
@@ -20,6 +21,11 @@ def index():
 @app.route("/metadata")
 def metadata_page():
     return render_template("main.html", active_page='metadata')
+
+@app.route("/train")
+@handle_errors
+def train_model():
+    return render_template("train.html", active_page='train')
 
 @app.route("/ollama")
 def ollama_page():
@@ -71,6 +77,27 @@ def generate_metadata():
         return jsonify({"metadata": metadata})
     except Exception as e:
         logger.error(f"Error in generate_metadata endpoint: {str(e)}")
+        raise
+
+@app.route("/api/train", methods=["POST"])
+@handle_errors
+def start_training():
+    logger.info("Received model training request")
+    data = request.json
+    base_model = data.get("base_model")
+    epochs = int(data.get("epochs", 5))
+    batch_size = int(data.get("batch_size", 2))
+    learning_rate = float(data.get("learning_rate", 1e-5))
+
+    if not base_model:
+        raise ValueError("Base model selection is required!")
+
+    try:
+        trainer = ModelTrainer()
+        trainer.train_model(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate)
+        return jsonify({"status": "success", "message": "Model training completed successfully"})
+    except Exception as e:
+        logger.error(f"Error in model training: {str(e)}")
         raise
 
 if __name__ == "__main__":

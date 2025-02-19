@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Model Training{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-brain me-2"></i>Model Training Configuration</h4>
+                </div>
+                <div class="card-body">
+                    <form id="training-form">
+                        <!-- Model Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Base Model</label>
+                            <select class="form-control" id="base_model" name="base_model" required>
+                                <option value="codegpt">CodeGPT</option>
+                            </select>
+                        </div>
+
+                        <!-- Training Parameters -->
+                        <div class="mb-3">
+                            <label class="form-label">Training Epochs</label>
+                            <input type="number" class="form-control" id="epochs" name="epochs" 
+                                   value="5" min="1" max="20">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Batch Size</label>
+                            <input type="number" class="form-control" id="batch_size" name="batch_size" 
+                                   value="2" min="1" max="8">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Learning Rate</label>
+                            <input type="number" class="form-control" id="learning_rate" name="learning_rate" 
+                                   value="0.00001" step="0.00001" min="0.00001" max="0.01">
+                        </div>
+
+                        <button type="button" id="start-training" class="btn btn-success w-100">
+                            <i class="fas fa-play me-2"></i>Start Training
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Training Progress</h4>
+                </div>
+                <div class="card-body">
+                    <div id="training-progress" class="d-none">
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <pre id="training-logs" class="bg-light p-3" 
+                             style="max-height: 300px; overflow-y: auto;">
+Training logs will appear here...
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts%}
+<script>
+document.getElementById('start-training').addEventListener('click', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        base_model: document.getElementById('base_model').value,
+        epochs: document.getElementById('epochs').value,
+        batch_size: document.getElementById('batch_size').value,
+        learning_rate: document.getElementById('learning_rate').value
+    };
+
+    // Show progress section
+    const progressDiv = document.getElementById('training-progress');
+    const progressBar = progressDiv.querySelector('.progress-bar');
+    const logsArea = document.getElementById('training-logs');
+    progressDiv.classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/api/train', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        logsArea.textContent = JSON.stringify(result, null, 2);
+        progressBar.style.width = '100%';        
+    } catch (error) {
+            console.error('Error:', error);
+            progressBar.classList.add('bg-danger');
+    }
+});
+</script>
+{% endblock %}

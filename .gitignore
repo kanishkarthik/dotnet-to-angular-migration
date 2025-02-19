@@ -59,3 +59,6 @@ Thumbs.db
 
 */venv/**
 .qodo
+results/
+CodeQuerySystem
+*/my_hybrid_model/**
