@@ -23,7 +23,7 @@ pre.json-output {
     font-size: 14px;
     white-space: pre-wrap;
 }
-.preview-icon, .copy-icon {
+.preview-icon, .copy-icon, .save-icon {
     cursor: pointer;
     color: #ffffff;
     margin-left: 10px;

@@ -13,7 +13,10 @@ const llmModelOptions = {
 
     ],
     gemini: [
-        { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro' }
+        { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro' },
+        { value:'gemini-2.0-flash', label: 'Gemini 2.0 Flash'},
+        { value:'gemini-2.0-flash-lite-preview-02-05', label: 'Gemini 2.0 Flash-Lite Preview'}
+
     ],
     gemini_ingest: [
         { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro' }
@@ -69,11 +72,12 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     const output = document.getElementById("output");
     const previewBtn = document.getElementById("previewBtn");
     const copyBtn = document.getElementById("copyBtn");
+    const saveBtn = document.getElementById("saveBtn");
     
     output.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
     previewBtn.style.display = 'none';
     copyBtn.style.display = 'none';
-
+    saveBtn.style.display = 'none';
     try {
         const formData = new URLSearchParams({
             country_code: countryCode,
@@ -102,6 +106,9 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
             output.innerHTML = `<pre class="json-output"><code>${formattedJson}</code></pre>`;
             previewBtn.style.display = 'inline';
             copyBtn.style.display = 'inline';
+            if(formData.get('save_metadata') == 'false') {
+                saveBtn.style.display = 'inline';
+            }
 
             // Preview button functionality
             previewBtn.addEventListener("click", () => {
@@ -153,4 +160,36 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('reindex').checked = false;
         }
     });
+});
+
+// Add event listener for save button
+document.getElementById('saveBtn').addEventListener('click', async function() {
+    const output = document.getElementById('output').textContent;
+    if (!output || output === 'Please fill out the form and click "Generate Metadata" to see the results here.') {
+        alert('No metadata to save!', 'warning');
+        return;
+    }
+
+    try {
+        const countryCode = document.getElementById("country_code").value;
+        const paymentMethod = document.getElementById("payment_method").value;
+        const response = await fetch('/save-metadata', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                key: countryCode+"_"+paymentMethod,
+                metadata: output
+            })
+        });
+
+        if (response.ok) {
+            alert('Metadata saved successfully!', 'success');
+        } else {
+            throw new Error('Failed to save metadata');
+        }
+    } catch (error) {
+        alert('Error saving metadata: ' + error.message, 'error');
+    }
 });
