@@ -45,10 +45,10 @@ class MetadataGenerator:
         base_file_path = os.path.join(self.aspnet_path, baseconfig_relative_path)
         file_path = os.path.join(self.aspnet_path, relative_path)
         filecontent = ''
-        if not os.path.exists(base_file_path):
-            raise FileNotFoundError(f"Configuration file not found at {base_file_path}")
-        with open(base_file_path, "r") as f:
-           filecontent = f.read()
+        # if not os.path.exists(base_file_path):
+        #     raise FileNotFoundError(f"Configuration file not found at {base_file_path}")
+        # with open(base_file_path, "r") as f:
+        #    filecontent = f.read()
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Configuration file not found at {file_path}")
         with open(file_path, "r") as f:
