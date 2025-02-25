@@ -101,8 +101,8 @@
                           autocomplete="off"
                           type="text"
                           class="form-control"
-                          (click)="openLookupModal(field, section.id)" readonly />
-                        <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section.id)">
+                          (click)="openLookupModal(field, section)" readonly />
+                        <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
                           <i class="fas fa-search"></i>
                         </button>
                       </div>
@@ -197,8 +197,8 @@
                         [required]="field.required"
                         type="text"
                         class="form-control"
-                        (click)="openLookupModal(field, section.id)" readonly />
-                      <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section.id)">
+                        (click)="openLookupModal(field, section)" readonly />
+                      <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>

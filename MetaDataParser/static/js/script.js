@@ -141,7 +141,7 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
 
 // Add event listener for AI model change to handle reindex visibility
 document.getElementById('ai_model').addEventListener('change', function() {
-    const reindexContainer = document.getElementById('reindex-container');
+    const reindexContainer = document.getElementById('reindexContainer');
     if (this.value === 'groq_ingest') {
         reindexContainer.classList.remove('d-none');
     } else {

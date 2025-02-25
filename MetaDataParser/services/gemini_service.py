@@ -14,24 +14,27 @@ class GeminiService(BaseLLMService):
     def analyze(self, content: str, custom_prompt: str = None) -> str:
         logger.info("Starting Gemini analysis")
         try:
-            base_prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
-            that can be used to dynamically render fields in an Angular UI."""
+            # base_prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
+            # that can be used to dynamically render fields in an Angular UI."""
+            prompt = ("""
+                You are an expert in analyzing ASP.NET MVC configuration files and generating JSON metadata.
+                Your task is to:
+                - Analyze the provided ASP.NET MVC configuration file.
+                - Generate JSON metadata to dynamically render fields in an Angular UI.
+                - Ensure the JSON metadata follows this structure:
+                {}
+                - Consider any additional UI parameters that may enhance the UI rendering.
+                - Include attributes only when necessary, avoiding redundant or empty properties.
+                - Facilitate dynamic field rendering in Angular, supporting different input types (e.g., text, dropdown, radio buttons).
 
-            if custom_prompt:
-                base_prompt = "{}{}.".format(base_prompt, custom_prompt)
+                ASP.NET MVC Configuration:
+                {}
 
-            prompt = f"""{base_prompt}
+                Additional Context:
+                {}
+            """.format(self.metadata_structure, content, custom_prompt))
 
-            The metadata format should match this structure, and you may need to consider additional UI parameters 
-            that are not explicitly mentioned and provide attributes only when necessary.
-
-            Sample Metadata:
-            {self.metadata_structure}
-
-            ASP.NET MVC Configuration:
-            {content}
-            """
-
+            # Log the request details for better traceability
             logger.info(f"Sending request to Gemini API with content length: {len(content)}")
             logger.info(f"Prompt: {prompt}")
             response = self.model.generate_content(prompt)

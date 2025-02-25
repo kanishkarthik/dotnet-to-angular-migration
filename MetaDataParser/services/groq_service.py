@@ -14,22 +14,35 @@ class GroqService(BaseLLMService):
     def analyze(self, content: str, custom_prompt: str = None) -> str:
         logger.info("Starting Groq analysis")
         try:
-            base_prompt = """Analyze the given ASP.NET MVC configuration file and generate JSON metadata 
-            that can be used to dynamically render fields in an Angular UI. 
+            # Define the prompt using a clear and standardized format
+            prompt = ("""
+                You are an expert in analyzing ASP.NET MVC configuration files and generating JSON metadata.
+                Your task is to:
+                - Analyze the provided ASP.NET MVC configuration file.
+                - Generate JSON metadata to dynamically render fields in an Angular UI.
+                - Ensure the JSON metadata follows this structure:
+                {}
+                - Consider any additional UI parameters that may enhance the UI rendering.
+                - Include attributes only when necessary, avoiding redundant or empty properties.
+                - Facilitate dynamic field rendering in Angular, supporting different input types (e.g., text, dropdown, radio buttons).
 
-            The metadata format should match this structure, and you may need to consider additional UI parameters 
-            that are not explicitly mentioned and provide attributes only when it is necessary:
-            """
-            
-            if custom_prompt:
-                base_prompt = "{}{}.".format(base_prompt, custom_prompt)
+                ASP.NET MVC Configuration:
+                {}
 
-            full_prompt = base_prompt + self.metadata_structure + f"\nAsp.NET MVC configuration:\n{content}"
+                Additional Context:
+                {}
+            """.format(self.metadata_structure, content, custom_prompt))
 
+            # Log the request details for better traceability
             logger.info(f"Sending request to Groq API with content length: {len(content)}")
-            logger.info(f"Prompt: {full_prompt}")
+            logger.info(f"Prompt: {prompt}")
+
+            # Send the request to the LLM with a clear role system
             response = self.client.chat.completions.create(
-                messages=[{"role": "user", "content": full_prompt}],
+                messages=[
+                    {"role": "system", "content": "You are an expert in ASP.NET MVC and Angular UI metadata generation."},
+                    {"role": "user", "content": prompt}
+                ],
                 model=self.llm_model,
             )
             logger.info("Successfully received response from Groq API")

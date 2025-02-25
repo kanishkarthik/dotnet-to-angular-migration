@@ -249,7 +249,6 @@ export class DynamicFormComponent implements OnInit {
 
   getDropdownValues(data: [], label: string) {
     const options = [];
-    options.push({ label: `--Select ${label}--`, value: '' });
     // data.forEach((item: any) => {
     //   options.push({ label: item.description, value: item.value });
     // });
@@ -261,9 +260,10 @@ export class DynamicFormComponent implements OnInit {
     return options;
   }
 
-  openLookupModal(field: any, section: string) {
+  openLookupModal(field: any, section: any ) {
     this.activeLookupField = field;
-    this.activeLookupField.section = section;
+    this.activeLookupField.section = section.id;
+    this.activeLookupField.label = section.title;
     this.lookupData = [
       { name: 'Item 1', description: 'Description 1' },
       { name: 'Item 2', description: 'Description 2' },
@@ -272,7 +272,6 @@ export class DynamicFormComponent implements OnInit {
       { name: 'Item 5', description: 'Description 5' }
     ];
     this.lookupHeaders = Object.keys(this.lookupData[0]);
-
     const modal = new bootstrap.Modal(document.getElementById('lookupModal'));
     modal.show();
   }
