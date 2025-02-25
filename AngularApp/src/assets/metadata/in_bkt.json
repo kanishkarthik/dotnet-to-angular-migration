@@ -1,126 +1,177 @@
 {
+  "formId": "India_BKT",
+  "country": "India",
+  "paymentMethod": "BKT",
   "sections": [
     {
-      "section": "PaymentMethod",
-      "title": "Payment Method",
+      "id": "paymentMethod",
+      "name": "Payment Method",
       "fields": [
         {
-          "field": "PaymentMethod_AccountNumber",
-          "label": "Account Number",
+          "id": "accountNumber",
+          "name": "Account Number",
           "type": "label"
         },
         {
-          "field": "PaymentMethod_PaymentCurrency",
-          "label": "Payment Currency",
+          "id": "paymentCurrency",
+          "name": "Payment Currency",
           "type": "label"
         },
         {
-          "field": "PaymentMethod_Amount",
-          "label": "Payment Amount",
+          "id": "amount",
+          "name": "Payment Amount",
           "type": "textbox",
-          "required": "true"
+          "required": true,
+          "maxLength": 5,
+          "validation": {
+            "messages": {
+              "required": "Payment amount is required",
+              "maxLength": "Payment amount should not exceed 5 characters"
+            }
+          }
         },
         {
-          "field": "PaymentMethod_AccountName",
-          "label": "Account Name",
+          "id": "accountName",
+          "name": "Account Name",
           "type": "label"
         },
         {
-          "field": "PaymentMethod_PaymentMethod",
-          "label": "Payment Method",
+          "id": "paymentMethod",
+          "name": "Payment Method",
           "type": "label"
         }
       ]
     },
     {
-      "section": "PaymentDetails",
-      "title": "Payment Details",
+      "id": "paymentDetails",
+      "name": "Payment Details",
       "fields": [
         {
-          "field": "PaymentDetails_TranRefNo",
-          "label": "Transaction Reference Number",
+          "id": "tranRefNo",
+          "name": "Transaction Reference Number",
           "type": "textbox",
-          "required": "true",
-          "maxLength": "10",
-          "pattern": "[a-zA-Z0-9]+"
+          "required": true,
+          "maxLength": 10,
+          "pattern": "[a-zA-Z0-9]+",
+          "validation": {
+            "messages": {
+              "required": "Transaction reference number is required",
+              "pattern": "Only letters and numbers allowed"
+            }
+          }
         },
         {
-          "field": "PaymentDetails_ValueDate",
-          "label": "Value Date",
+          "id": "valueDate",
+          "name": "Value Date",
           "type": "date",
-          "required": "true"
+          "required": true,
+          "validation": {
+            "messages": {
+              "required": "Value date is required"
+            }
+          }
         },
         {
-          "field": "PaymentDetails_isConfidential",
-          "label": "Confidential",
+          "id": "isConfidential",
+          "name": "Confidential",
           "type": "checkbox"
         },
         {
-          "field": "PaymentDetails_EmailAddress",
-          "label": "Email Address",
+          "id": "emailAddress",
+          "name": "Email Address",
           "type": "textbox",
-          "pattern": "[a-zA-Z0-9]+@[a-zA-Z0-9]+.[a-zA-Z0-9]+"
+          "pattern": "[a-zA-Z0-9]+@[a-zA-Z0-9]+.[a-zA-Z0-9]+",
+          "validation": {
+            "messages": {
+              "pattern": "Invalid email address"
+            }
+          }
         },
         {
-          "field": "PaymentDetails_TranTypeCode",
-          "label": "Transaction Type Code",
+          "id": "tranTypeCode",
+          "name": "Transaction Type Code",
           "type": "lookup",
-          "required": "true"
+          "required": true,
+          "validation": {
+            "messages": {
+              "required": "Transaction type code is required"
+            }
+          }
         },
         {
-          "field": "PaymentDetails_TranTypeDesc",
-          "label": "Transaction Type Description",
+          "id": "tranTypeDesc",
+          "name": "Transaction Type Description",
           "type": "textarea"
         }
       ]
     },
     {
-      "section": "BeneficiaryDetails",
-      "title": "Beneficiary Details",
+      "id": "beneficiaryDetails",
+      "name": "Beneficiary Details",
       "fields": [
         {
-          "field": "BeneficiaryDetails_BeneName",
-          "label": "Beneficiary Name",
+          "id": "beneName",
+          "name": "Beneficiary Name",
           "type": "lookup",
-          "required": "true"
+          "required": true,
+          "validation": {
+            "messages": {
+              "required": "Beneficiary name is required"
+            }
+          }
         },
         {
-          "field": "BeneficiaryDetails_BeneAcctNo",
-          "label": "Beneficiary Account Number",
+          "id": "beneAcctNo",
+          "name": "Beneficiary Account Number",
           "type": "textbox",
-          "required": "true"
+          "required": true,
+          "validation": {
+            "messages": {
+              "required": "Beneficiary account number is required"
+            }
+          }
         },
         {
-          "field": "BeneficiaryDetails_DestinationBranch",
-          "label": "Destination Branch",
+          "id": "destinationBranch",
+          "name": "Destination Branch",
           "type": "dropdown",
-          "required": "true"
+          "required": true,
+          "validation": {
+            "messages": {
+              "required": "Destination branch is required"
+            }
+          }
         },
         {
-          "field": "BeneficiaryDetails_AddrssLine1",
-          "label": "Beneficiary Address Line 1",
+          "id": "addrssLine1",
+          "name": "Beneficiary Address Line 1",
           "type": "textbox"
         },
         {
-          "field": "BeneficiaryDetails_AddrssLine2",
-          "label": "Beneficiary Address Line 2",
+          "id": "addrssLine2",
+          "name": "Beneficiary Address Line 2",
           "type": "textbox"
         }
       ]
     },
     {
-      "section": "OrderingPartyDetails",
-      "title": "Ordering Party Details",
+      "id": "orderingPartyDetails",
+      "name": "Ordering Party Details",
       "fields": [
         {
-          "field": "OrderingPartyDetails_Name",
-          "label": "Ordering Party Name",
+          "id": "name",
+          "name": "Ordering Party Name",
           "type": "textbox",
-          "maxLength": "50"
+          "maxLength": 50,
+          "validation": {
+            "messages": {
+              "maxLength": "Ordering party name should not exceed 50 characters"
+            }
+          }
         },
         {
-          "field": "OrderingPartyDetails_Address",
-          "label": "Ordering Party Address",
+          "id": "address",
+          "name": "Ordering Party Address",
           "type": "textarea"
         }
       ]

@@ -1,19 +1,27 @@
 {
-    "sections": [
-      {
-        "section": "sectionName",
-        "title": "Section Title",
-        "fields": [
-          {
-            "field": "sectionName_fieldName",
-            "label": "Field Label",
-            "type": "FieldType",
-            "required": "true",
-            "disabled": "true",
-            "pattern": "[a-z]"
+  "formId": "US_BKT",
+  "country": "US",
+  "paymentMethod": "BKT",
+  "sections": [
+    {
+      "id": "paymentDetails",
+      "name": "Payment Details",
+      "fields": [
+        {
+          "id": "tranRefNo",
+          "name": "Transaction Reference",
+          "type": "textbox",
+          "required": true,
+          "pattern": "[A-Z0-9]+",
+          "maxLength": 10,
+          "validation": {
+            "messages": {
+              "required": "Transaction reference is required",
+              "pattern": "Only uppercase letters and numbers allowed"
+            }
           }
-        ]
-      }
-    ]
-  }
-  
+        }
+      ]
+    }
+  ]
+}

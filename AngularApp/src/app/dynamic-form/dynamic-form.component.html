@@ -71,21 +71,20 @@
               
               <ng-template #regularSection>
                 <h3 class="section-title border-bottom pb-2 mb-4 fw-normal text-primary">{{ section.title }}</h3>
-                <form [formGroup]="forms[section.section]" class="row g-4" autocomplete="off">
+                <form [formGroup]="forms[section.id]" class="row g-4" autocomplete="off">
                   <div *ngFor="let field of section.fields" class="col-md-4">
                     <div class="mb-3">
-                      <!-- Label -->
-                      <label for="{{ field.field }}" class="form-label text-muted small text-uppercase">
-                        {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
+                      <label [for]="field.id" class="form-label text-muted small text-uppercase">
+                        {{ field.name }} <span *ngIf="field.required" class="text-danger">*</span>
                       </label>
 
                       <!-- Textbox -->
                       <input *ngIf="field.type === 'textbox'" 
-                        [formControlName]="field.field"
-                        [id]="field.field"
+                        [formControlName]="field.id"
+                        [id]="field.id"
                         [required]="field.required"
-                        [pattern]="field.pattern || null"
-                        autocomplete="off"
+                        [pattern]="field.pattern"
+                        [maxlength]="field.maxLength"
                         type="text"
                         class="form-control shadow-sm" />
 
@@ -96,37 +95,37 @@
 
                       <!-- Lookup -->
                       <div *ngIf="field.type === 'lookup'" class="input-group shadow-sm">
-                        <input [formControlName]="field.field"
-                          [id]="field.field"
+                        <input [formControlName]="field.id"
+                          [id]="field.id"
                           [required]="field.required"
                           autocomplete="off"
                           type="text"
                           class="form-control"
-                          (click)="openLookupModal(field, section)" readonly />
-                        <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
+                          (click)="openLookupModal(field, section.id)" readonly />
+                        <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section.id)">
                           <i class="fas fa-search"></i>
                         </button>
                       </div>
 
                       <!-- Date -->
                       <input *ngIf="field.type === 'date'"
-                        [formControlName]="field.field"
-                        [id]="field.field"
+                        [formControlName]="field.id"
+                        [id]="field.id"
                         type="date"
                         class="form-control shadow-sm" />
 
                       <!-- Checkbox -->
                       <div class="form-check" *ngIf="field.type === 'checkbox'">
-                        <input [formControlName]="field.field"
-                          [id]="field.field"
+                        <input [formControlName]="field.id"
+                          [id]="field.id"
                           type="checkbox"
                           class="form-check-input shadow-sm" />
                       </div>
 
                       <!-- Dropdown -->
                       <select *ngIf="field.type === 'dropdown'"
-                        [formControlName]="field.field"
-                        [id]="field.field"
+                        [formControlName]="field.id"
+                        [id]="field.id"
                         class="form-select shadow-sm">
                         <option value="" disabled selected>-- Select --</option>
                         <option *ngFor="let option of field.options" [value]="option.value">
@@ -136,24 +135,24 @@
 
                       <!-- Textarea -->
                       <textarea *ngIf="field.type === 'textarea'"
-                        [formControlName]="field.field"
-                        [id]="field.field"
+                        [formControlName]="field.id"
+                        [id]="field.id"
                         class="form-control shadow-sm"></textarea>
 
                       <!-- Error Message -->
-                      <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
+                      <div *ngIf="forms[section.id].get(field.id)?.invalid && forms[section.id].get(field.id)?.touched"
                         class="text-danger small mt-2">
-                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
-                          {{ field.label }} is required.
+                        <small *ngIf="forms[section.id].get(field.id)?.errors?.['required']">
+                          {{ field.validation?.messages?.required || (field.name + ' is required') }}
                         </small>
-                          <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
-                          Invalid format for {{ field.label }}.
+                          <small *ngIf="forms[section.id].get(field.id)?.errors?.['pattern']">
+                          {{ field.validation?.messages?.pattern || ('Invalid format for ' + field.name) }}
                           </small>
-                          <small *ngIf="forms[section.section].get(field.field)?.errors?.['minlength']">
+                          <small *ngIf="forms[section.id].get(field.id)?.errors?.['minlength']">
                           {{ field.label }} must be at least {{ field.minLength }} characters long.
                           </small>
-                          <small *ngIf="forms[section.section].get(field.field)?.errors?.['maxlength']">
-                          {{ field.label }} cannot be more than {{ field.maxLength }} characters long.
+                          <small *ngIf="forms[section.id].get(field.id)?.errors?.['maxlength']">
+                          {{ field.validation?.messages?.maxLength || (field.name + ' cannot be more than ' + field.maxLength + ' characters long') }}
                           </small>
                       </div>
                     </div>
@@ -172,17 +171,17 @@
               <form [formGroup]="forms[section.section]" class="row g-4" autocomplete="off">
                 <div *ngFor="let field of section.fields" class="col-md-4">
                   <div class="mb-3">
-                    <!-- Label -->
-                    <label for="{{ field.field }}" class="form-label text-muted small text-uppercase">
-                      {{ field.label}} <span *ngIf="field.required" class="text-danger">*</span>
+                    <label [for]="field.id" class="form-label text-muted small text-uppercase">
+                      {{ field.name }} <span *ngIf="field.required" class="text-danger">*</span>
                     </label>
 
                     <!-- Textbox -->
                     <input *ngIf="field.type === 'textbox'" 
-                      [formControlName]="field.field"
-                      [id]="field.field"
+                      [formControlName]="field.id"
+                      [id]="field.id"
                       [required]="field.required"
-                      [pattern]="field.pattern || null"
+                      [pattern]="field.pattern"
+                      [maxlength]="field.maxLength"
                       type="text"
                       class="form-control shadow-sm" />
 
@@ -193,36 +192,36 @@
 
                     <!-- Lookup -->
                     <div *ngIf="field.type === 'lookup'" class="input-group shadow-sm">
-                      <input [formControlName]="field.field"
-                        [id]="field.field"
+                      <input [formControlName]="field.id"
+                        [id]="field.id"
                         [required]="field.required"
                         type="text"
                         class="form-control"
-                        (click)="openLookupModal(field, section)" readonly />
-                      <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section)">
+                        (click)="openLookupModal(field, section.id)" readonly />
+                      <button class="btn btn-outline-secondary" type="button" (click)="openLookupModal(field, section.id)">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
 
                     <!-- Date -->
                     <input *ngIf="field.type === 'date'"
-                      [formControlName]="field.field"
-                      [id]="field.field"
+                      [formControlName]="field.id"
+                      [id]="field.id"
                       type="date"
                       class="form-control shadow-sm" />
 
                     <!-- Checkbox -->
                     <div class="form-check" *ngIf="field.type === 'checkbox'">
-                      <input [formControlName]="field.field"
-                        [id]="field.field"
+                      <input [formControlName]="field.id"
+                        [id]="field.id"
                         type="checkbox"
                         class="form-check-input shadow-sm" />
                     </div>
 
                     <!-- Dropdown -->
                     <select *ngIf="field.type === 'dropdown'"
-                      [formControlName]="field.field"
-                      [id]="field.field"
+                      [formControlName]="field.id"
+                      [id]="field.id"
                       class="form-select shadow-sm">
                       <option value="" disabled selected>-- Select --</option>
                       <option *ngFor="let option of field.options" [value]="option.value">
@@ -232,24 +231,24 @@
 
                     <!-- Textarea -->
                     <textarea *ngIf="field.type === 'textarea'"
-                      [formControlName]="field.field"
-                      [id]="field.field"
+                      [formControlName]="field.id"
+                      [id]="field.id"
                       class="form-control shadow-sm"></textarea>
 
                     <!-- Error Message -->
-                    <div *ngIf="forms[section.section].get(field.field)?.invalid && forms[section.section].get(field.field)?.touched"
+                    <div *ngIf="forms[section.id].get(field.id)?.invalid && forms[section.id].get(field.id)?.touched"
                       class="text-danger small mt-2">
-                      <small *ngIf="forms[section.section].get(field.field)?.errors?.['required']">
-                        {{ field.label }} is required.
+                      <small *ngIf="forms[section.id].get(field.id)?.errors?.['required']">
+                        {{ field.validation?.messages?.required || (field.name + ' is required') }}
                       </small>
-                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['pattern']">
-                        Invalid format for {{ field.label }}.
+                        <small *ngIf="forms[section.id].get(field.id)?.errors?.['pattern']">
+                        {{ field.validation?.messages?.pattern || ('Invalid format for ' + field.name) }}
                         </small>
-                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['minlength']">
+                        <small *ngIf="forms[section.id].get(field.id)?.errors?.['minlength']">
                         {{ field.label }} must be at least {{ field.minLength }} characters long.
                         </small>
-                        <small *ngIf="forms[section.section].get(field.field)?.errors?.['maxlength']">
-                        {{ field.label }} cannot be more than {{ field.maxLength }} characters long.
+                        <small *ngIf="forms[section.id].get(field.id)?.errors?.['maxlength']">
+                        {{ field.validation?.messages?.maxLength || (field.name + ' cannot be more than ' + field.maxLength + ' characters long') }}
                         </small>
                     </div>
                   </div>

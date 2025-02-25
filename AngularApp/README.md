@@ -1,6 +1,16 @@
-# AngularApp
+# Angular Payment Processing Application
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.1.
+## Overview
+Dynamic form-based Angular application for payment processing, driven by metadata configurations.
+
+## Features
+- Dynamic form generation from metadata
+- Reactive Forms implementation
+- Region and payment method based routing
+- Bootstrap UI integration
+- Type-safe metadata interfaces
+
+## Project Structure
 
 ## Development server
 

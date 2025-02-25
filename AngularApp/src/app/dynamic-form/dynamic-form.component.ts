@@ -5,6 +5,29 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 declare var bootstrap: any;
+
+interface Field {
+  id: string;
+  name: string;
+  type: string;
+  required?: boolean;
+  maxLength?: number;
+  pattern?: string;
+  validation?: {
+    messages: {
+      [key: string]: string;
+    }
+  };
+  options?: any[];
+  value?: any;
+}
+
+interface Section {
+  id: string;
+  name: string;
+  fields: Field[];
+}
+
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
@@ -58,38 +81,38 @@ export class DynamicFormComponent implements OnInit {
       }
       this.formConfig = config;
       this.initializeForms();
-      this.steps = this.formConfig.sections.map((section: any, index: number) => ({
-        ...section,
+      this.steps = this.formConfig.sections.map((section: Section, index: number) => ({
+        id: section.id,
+        section: section.id,
+        title: section.name,
+        fields: section.fields,
         completed: false,
         active: index === 0
       }));
-      //this.loadDataFromConfig(this.metaDataKey).subscribe((data) => {
-      this.formConfig.sections.forEach((section: any) => {
-        if (section.section.toLowerCase().indexOf('PaymentMethod'.toLowerCase()) !== -1) {
-          section.fields.forEach((field: any) => {
-            const fieldElm = field.field.toLowerCase();
-            if (fieldElm === (section.section+'_PaymentMethod').toLowerCase()) {
+
+      this.formConfig.sections.forEach((section: Section) => {
+        if (section.id.toLowerCase() === 'paymentmethod') {
+          section.fields.forEach((field: Field) => {
+            const fieldId = field.id.toLowerCase();
+            if (fieldId === 'paymentmethod') {
               field.value = redirectDataObj.paymentMethodDescription;
-            } else if (fieldElm === (section.section+'_AccountNumber').toLowerCase()) {
+            } else if (fieldId === 'accountnumber') {
               field.value = redirectDataObj.accountNumber;
-            } else if (fieldElm === (section.section+'_PaymentCurrency').toLowerCase()) {
+            } else if (fieldId === 'paymentcurrency') {
               field.value = redirectDataObj.currency;
-            } else if (fieldElm === (section.section+'_AccountName').toLowerCase()) {
+            } else if (fieldId === 'accountname') {
               field.value = redirectDataObj.accountName;
             }
-            this.forms[section.section].patchValue({ [field.field]: field.value });
+            this.forms[section.id].patchValue({ [field.id]: field.value });
           });
         }
       });
       this.addReviewStep();
-      // sessionStorage.removeItem('redirectData');
       this.setFormData({});
       this.initilizeDropdownOptions({});
-      // }, (error) => {
-
-      // });
     });
   }
+
   setFormData(data: any) {
   }
 
@@ -107,18 +130,17 @@ export class DynamicFormComponent implements OnInit {
   }
 
   initializeForms(): void {
-    this.formConfig.sections.forEach((section: any) => {
+    this.formConfig.sections.forEach((section: Section) => {
       const group: any = {};
       
-      section.fields.forEach((field: any) => {
+      section.fields.forEach((field: Field) => {
         const validators = [];
-        if (field.required == "true") validators.push(Validators.required);
-        if (field.pattern) validators.push(Validators.pattern(`^${field.pattern}$`));``
-        if (field.maxLength) validators.push(Validators.maxLength(parseInt(field.maxLength)));
-        if (field.minLength) validators.push(Validators.minLength(parseInt(field.minLength)));        
-        group[field.field] = new FormControl({ value: '', disabled: field.disabled == "true" || false }, validators);
+        if (field.required) validators.push(Validators.required);
+        if (field.pattern) validators.push(Validators.pattern(field.pattern));
+        if (field.maxLength) validators.push(Validators.maxLength(field.maxLength));
+        group[field.id] = new FormControl({ value: field.value || '', disabled: false }, validators);
       });
-      this.forms[section.section] = this.fb.group(group);
+      this.forms[section.id] = this.fb.group(group);
     });
   }
 
@@ -162,6 +184,7 @@ export class DynamicFormComponent implements OnInit {
   canProceed(): boolean {
     if (this.currentStep >= this.steps.length) return false;
     const currentSection = this.steps[this.currentStep].section;
+    console.log( this.forms[currentSection].valid, currentSection);
     return this.forms[currentSection].valid;
   }
 
@@ -256,7 +279,8 @@ export class DynamicFormComponent implements OnInit {
 
   selectLookupItem(item: any) {
     if (this.activeLookupField) {
-      this.forms[this.activeLookupField.section.section].get(this.activeLookupField.field)?.setValue(item.name);
+      // Use the field's id instead of field property
+      this.forms[this.activeLookupField.section].get(this.activeLookupField.id)?.setValue(item.name);
     }
     const modal = bootstrap.Modal.getInstance(document.getElementById('lookupModal'));
     modal.hide();
@@ -266,10 +290,10 @@ export class DynamicFormComponent implements OnInit {
     const formattedData: any[] = [];
     this.formConfig.sections.forEach((section: any) => {
       const sectionData = {
-        title: section.title,
+        title: section.name,  // Using section.name instead of section.title
         fields: section.fields.map((field: any) => ({
-          label: field.label,
-          value: this.forms[section.section].get(field.field)?.value || ''
+          label: field.name,  // Using field.name which contains the display label
+          value: this.forms[section.id].get(field.id)?.value || ''
         }))
       };
       formattedData.push(sectionData);
