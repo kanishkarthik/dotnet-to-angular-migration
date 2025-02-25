@@ -27,6 +27,7 @@ class GroqService(BaseLLMService):
             full_prompt = base_prompt + self.metadata_structure + f"\nAsp.NET MVC configuration:\n{content}"
 
             logger.info(f"Sending request to Groq API with content length: {len(content)}")
+            logger.info(f"Prompt: {full_prompt}")
             response = self.client.chat.completions.create(
                 messages=[{"role": "user", "content": full_prompt}],
                 model=self.llm_model,

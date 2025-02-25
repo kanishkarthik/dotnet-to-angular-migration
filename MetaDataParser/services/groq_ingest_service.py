@@ -105,6 +105,7 @@ class GroqIngestService(BaseLLMService):
                 "5. Clearly indicate which files were used to generate the JSON metadata.\n"
                 f"6. If both {country_code} and {payment_method}-specific configurations exist, extract relevant implementation details "
                 "and generate JSON metadata accordingly.\n"
+                "7. Include a validation section for each applicable field (e.g., required, maxlength, pattern, etc.) when necessary."
             )
             
             if custom_prompt:

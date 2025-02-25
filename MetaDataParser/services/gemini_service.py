@@ -33,6 +33,7 @@ class GeminiService(BaseLLMService):
             """
 
             logger.info(f"Sending request to Gemini API with content length: {len(content)}")
+            logger.info(f"Prompt: {prompt}")
             response = self.model.generate_content(prompt)
             logger.info("Successfully received response from Gemini API")
             logger.info(f"Raw response from Gemini: {response.text}")
