@@ -106,6 +106,7 @@ class GroqIngestService(BaseLLMService):
                 f"6. If both {country_code} and {payment_method}-specific configurations exist, extract relevant implementation details "
                 "and generate JSON metadata accordingly.\n"
                 "7. Include a validation section for each applicable field (e.g., required, maxlength, pattern, etc.) when necessary."
+                "8. Provide the respective formId, country and payment method details"
             )
             
             if custom_prompt:

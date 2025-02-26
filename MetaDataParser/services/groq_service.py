@@ -20,6 +20,7 @@ class GroqService(BaseLLMService):
                 Your task is to:
                 - Analyze the provided ASP.NET MVC configuration file.
                 - Generate JSON metadata to dynamically render fields in an Angular UI.
+                - Provide the respective formId, country and payment method details
                 - Ensure the JSON metadata follows this structure:
                 {}
                 - Consider any additional UI parameters that may enhance the UI rendering.

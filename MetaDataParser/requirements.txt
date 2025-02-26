@@ -1,3 +1,4 @@
+dotenv
 google-generativeai
 groq
 ollama

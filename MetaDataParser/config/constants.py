@@ -1,14 +1,16 @@
 import os
+from dotenv import load_dotenv, find_dotenv
+
+_ = load_dotenv()
 
 # Groq API Key and Endpoint
-GROQ_API_KEY = "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"
-# "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"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Groq (LLM)
 GROQ_LARGE_LANGUAGE_MODEL = "llama-3.3-70b-versatile"
 
 # Gemini API Key
-GEMINI_API_KEY = "AIzaSyANB3nTAyUGRfMmpYQp73hI-3ZUyAp5Q-k"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Gemini Model
 GEMINI_MODEL = "gemini-1.5-pro-latest"

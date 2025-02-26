@@ -62,3 +62,4 @@ Thumbs.db
 results/
 CodeQuerySystem
 */my_hybrid_model/**
+/MetaDataParser/config/.env
