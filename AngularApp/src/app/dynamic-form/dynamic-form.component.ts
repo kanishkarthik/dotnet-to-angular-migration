@@ -263,7 +263,7 @@ export class DynamicFormComponent implements OnInit {
   openLookupModal(field: any, section: any ) {
     this.activeLookupField = field;
     this.activeLookupField.section = section.id;
-    this.activeLookupField.label = section.title;
+    this.activeLookupField.label = field.name;
     this.lookupData = [
       { name: 'Item 1', description: 'Description 1' },
       { name: 'Item 2', description: 'Description 2' },

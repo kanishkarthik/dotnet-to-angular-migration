@@ -104,7 +104,7 @@ namespace DotNetApp.Core.ViewConfiguration
                 {
                     controls.AppendLine("<div class='flex-group'>");
                     controls.AppendLine(string.Format("<input type='text' id='{0}' name='{0}' />", property.Id));
-                    controls.AppendLine("<button onclick=openPopup('" + property.Id.Trim().Replace(".","_") + "')>🔍</button>");
+                    controls.AppendLine("<button  id='" + property.Id.Trim().Replace(".","_")  +"_lookup' name='" + property.Id.Trim().Replace(".", "_") + "_lookup'  onclick=openPopup('" + property.Id.Trim().Replace(".","_") + "')>🔍</button>");
                     controls.AppendLine("</div>");
                     controls.Append("<div class='info " + property.Id + "'></div>");
                 }

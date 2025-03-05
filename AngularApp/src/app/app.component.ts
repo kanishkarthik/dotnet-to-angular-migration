@@ -5,7 +5,7 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, DynamicFormComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

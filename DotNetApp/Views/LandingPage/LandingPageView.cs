@@ -82,7 +82,7 @@ namespace Application.Views.LandingPage
                 {
                     controls.AppendLine("<div class='flex-group'>");
                     controls.AppendLine(string.Format("<input type='text' id='{0}' name='{0}' />", property.Id));
-                    controls.AppendLine("<button onclick=openPopup('"+ property.Id.Trim() + "')>🔍</button>");
+                    controls.AppendLine("<button id='{0}_lookup' onclick=openPopup('" + property.Id.Trim() + "')>🔍</button>");
                     controls.AppendLine("</div>");
                     controls.Append("<div class='info "+ property.Id+ "'></div>");
                 }

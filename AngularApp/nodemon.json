@@ -1,0 +1,6 @@
+{
+  "watch": ["src/assets/metadata"],
+  "ext": "json",
+  "ignore": ["src/assets/metadata/*.json.tmp"],
+  "delay": "2500"
+}
