@@ -7,7 +7,7 @@ body {
 }
 #output {
     background: #fff;
-    border: 1px solid #dee2e6;
+    /* border: 1px solid #dee2e6; */
     border-radius: 0.25rem;
     padding: 1rem;
     max-height: 700px;
@@ -31,4 +31,15 @@ pre.json-output {
 }
 .preview-icon:hover, .copy-icon:hover {
     color: #dddddd;
+}
+#vscodeeditor-container {
+    width: 100%;
+    max-height: 100vh; /* Prevents overflow */
+    overflow: hidden;
+    /* border: 1px solid #ccc; */
+}
+.container2 {
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 20px;
 }

@@ -23,6 +23,7 @@ const llmModelOptions = {
     ],
 
 };
+let vsCodeEditor = null;
 
 document.getElementById("ai_model").addEventListener("change", function() {
     const llmModelSelect = document.getElementById("llm_model");
@@ -70,14 +71,17 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
     const customPrompt = document.getElementById("custom_prompt").value;
     const reindex = document.getElementById("reindex")?.checked || false;
     const output = document.getElementById("output");
+    const vsCodeEditorContainer = document.getElementById("vscodeeditor-container");
     const previewBtn = document.getElementById("previewBtn");
     const copyBtn = document.getElementById("copyBtn");
     const saveBtn = document.getElementById("saveBtn");
     
     output.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+    output.style.display = 'inline';
     previewBtn.style.display = 'none';
     copyBtn.style.display = 'none';
     saveBtn.style.display = 'none';
+    vsCodeEditorContainer.style.display = 'none';
     try {
         const formData = new URLSearchParams({
             country_code: countryCode,
@@ -104,6 +108,9 @@ document.getElementById("metadata-form").addEventListener("submit", async functi
             data.metadata = data.metadata || "{}";
             const formattedJson = JSON.stringify(JSON.parse(data.metadata, null, 2), null, 2);
             output.innerHTML = `<pre class="json-output"><code>${formattedJson}</code></pre>`;
+            output.style.display = 'none';
+            vsCodeEditorContainer.style.display = 'block';
+            updateVsCodeViewer(formattedJson);
             previewBtn.style.display = 'inline';
             copyBtn.style.display = 'inline';
             if(formData.get('save_metadata') == 'false') {
@@ -193,3 +200,31 @@ document.getElementById('saveBtn').addEventListener('click', async function() {
         alert('Error saving metadata: ' + error.message, 'error');
     }
 });
+
+
+require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
+require(["vs/editor/editor.main"], function () {
+    vsCodeEditor = monaco.editor.create(document.getElementById('vsCodeEditor'), {
+        value: "// Please fill out the form and click 'Generate Metadata' to see the results here.",
+        language: "json",
+        theme: "vs-dark",
+        readOnly: false
+    }); 
+    updateEditorHeight(); // Set initial height 
+});
+
+function updateVsCodeViewer(formattedJson) {
+    vsCodeEditor.setValue(formattedJson);
+    updateEditorHeight(); // Adjust height after setting new content
+}
+function updateEditorHeight() {
+    if (!vsCodeEditor) return;
+    const lineCount = vsCodeEditor.getModel().getLineCount();
+    const newHeight = Math.min(50 + lineCount * 20, window.innerHeight * 0.8); // Adjust height dynamically
+
+    document.getElementById('vsCodeEditor').style.height = newHeight + "px"; // Update container height
+    vsCodeEditor.layout(); // Refresh layout
+}
+ // Adjust height when content changes
+window.addEventListener("resize", updateEditorHeight);
+

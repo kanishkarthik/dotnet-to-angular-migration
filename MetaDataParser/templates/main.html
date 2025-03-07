@@ -3,7 +3,7 @@
 {% block title %}Metadata Generator{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container2 mt-5">
     <div class="row">
         <!-- Input Section -->
         <div class="col-md-4">
@@ -104,13 +104,15 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <div id="vscodeeditor-container"  style="display: none;">
+                        <div id="vsCodeEditor" ></div>
+                    </div>
                     <pre id="output" class="mb-0">Please fill out the form and click "Generate Metadata" to see the results here.</pre>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Modal for Preview -->
 <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -127,5 +129,6 @@
 </div>
 {% endblock %}
 {% block extra_scripts%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
 <script src="../static/js/script.js"></script>
 {% endblock %}
